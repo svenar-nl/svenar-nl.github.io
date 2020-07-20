@@ -1,11 +1,542 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <title>Svenar-nl.GitHub.io</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-172992272-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-172992272-1');
+    </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>PowerRanks Editor</title>
+    <link rel="stylesheet" href="assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="assets/vendors/css/vendor.bundle.base.css">
+    <!-- <link rel="stylesheet" href="assets/vensors/css/perfect-scrollbar.min.css" /> -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="shortcut icon" href="assets/images/favicon.png" />
   </head>
+
   <body>
-    <h1>Hello, World!</h1>
+    <div id="popups">
+
+      <div id="popup-exit" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
+        <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+        <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
+          <h1>Exit?</h1>
+          <p>Any unsaved progress will be lost.</p>
+          <div class="btn-group">
+            <button class="btn btn-danger" onclick="window.location = window.location.origin + window.location.pathname;">Exit</button>
+            <button class="btn btn-success" onclick="$('#popup-exit').fadeOut();">Stay</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="popup-save" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
+        <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+        <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
+          <h1>Save?</h1>
+          <p>This will overwrite your current save.</p>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="saveDataCookie();">Save</button>
+            <button class="btn btn-secondary" onclick="$('#popup-save').fadeOut();">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="popup-save-done" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
+        <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+        <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
+          <h1>Done saving!</h1>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="$('#popup-save-done').fadeOut();">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="popup-exporting" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
+        <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+        <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
+          <h1>Exporting...</h1>
+        </div>
+      </div>
+
+      <div id="popup-export-done" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
+        <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+        <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
+          <h1>Export ready!</h1>
+          <p>Export id: <span id="export-id" style="color: #8a8a8a;">-</span></p>
+          <p>Command: <span id="export-command" style="color: #8a8a8a;">/pr webeditor load -</span></p>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="$('#popup-export-done').fadeOut();">Close</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="noidoverlayloading" style="display: none; position: fixed;width: 100%;height: 100%;z-index: 999999;background-color: #191c24;">
+      <div class="loader-demo-box" style="height: 100%;border: 0px solid #191c24 !important;">
+        <div class="pixel-loader"></div>
+      </div>
+    </div>
+    <div id="noidoverlay" style="position: fixed;margin: 0px;top: 0px;left: 0px;width: 100%;height: 100%;background-color: #191c24;z-index: 999990;">
+      <div class="row w-100 m-0" style="height: 100%;">
+        <div class="content-wrapper full-page-wrapper d-flex align-items-center auth login-bg">
+          <div class="card col-lg-4 mx-auto">
+            <div class="card-body px-5 py-5">
+              <h3 class="card-title text-left mb-3">PowerRanks Editor</h3>
+              
+              <form>
+                <div class="form-group">
+                  <label>Editor ID:</label>
+                  <input id="noidoverlayinputid" type="text" class="form-control p_input" name="id">
+                </div>
+                <p id="noidoverlayinvalidid" class="card-text" style="color: #F00; display: none;">Oh no! The ID you entered does not work.</p>
+                <div class="text-center">
+                  <button id="noidoverlaybtneditorsubmit" type="submit" class="btn btn-primary btn-block enter-btn" style="display: none;">Submit</button>
+                  <button id="noidoverlaybtneditordemo" type="submit" onclick="$('#noidoverlayinputid').val('demo');" class="btn btn-primary btn-block enter-btn">Demo</button>
+                  <button id="noidoverlaybtneditorloadcookie" onclick="$('#noidoverlayinputid').val('save');" class="btn btn-success btn-block enter-btn" style="display: none;">Load</button>
+                </div>
+              </form>
+              <h4 class="card-text">Edit your PowerRanks configuration files in an easy to use web interface.</h4>
+              <p class="card-text">To start a new editor session, use the following command: <strong>/pr webeditor</strong> and enter the ID.<br />Or explore the demo to see the editor's features!</p>
+              <p class="card-text"><small>Requires PowerRanks v1.0 or higher & PowerRanksWebEditor.jar add-on</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor content -->
+    <div class="container-scroller">
+      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
+          <a class="sidebar-brand brand-logo" href="#">
+            <h3 style="color: #FFF;margin-bottom: 0px;">PowerRanks Editor</h3>
+          </a>
+          <a class="sidebar-brand brand-logo-mini" href="#">
+            <h3 style="color: #FFF;margin-bottom: 0px;">PRE</h3>
+          </a>
+        </div>
+        <ul class="nav">
+          <li class="nav-item profile">
+            <div class="profile-desc">
+              <div class="profile-pic">
+                <div class="count-indicator">
+                  <img class="img-xs rounded-circle " src="assets/images/PowerRanksLogoRound.png" alt="">
+                  <span class="count bg-success"></span>
+                </div>
+                <div class="profile-name">
+                  <h5 class="mb-0 font-weight-normal">{{server_placeholder}}</h5>
+                  <span>PowerRanks v{{powerranks_version}} Standard</span>
+                </div>
+              </div>
+              <!-- <a href="#" id="profile-dropdown" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></a>
+              <div class="dropdown-menu dropdown-menu-right sidebar-dropdown preview-list" aria-labelledby="profile-dropdown">
+                <a href="#" class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-settings text-primary"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1 text-small">Account settings</p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-onepassword  text-info"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1 text-small">Change Password</p>
+                  </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-dark rounded-circle">
+                      <i class="mdi mdi-calendar-today text-success"></i>
+                    </div>
+                  </div>
+                  <div class="preview-item-content">
+                    <p class="preview-subject ellipsis mb-1 text-small">To-do list</p>
+                  </div>
+                </a>
+              </div> -->
+            </div>
+          </li>
+          <li class="nav-item nav-category">
+            <span class="nav-link">Navigation</span>
+          </li>
+
+          <li class="nav-item menu-items">
+            <a class="nav-link" onclick="show_content('dashboard', '');" style="cursor: pointer;">
+              <span class="menu-icon">
+                <i class="mdi mdi-chart-bar"></i>
+              </span>
+              <span class="menu-title">Dashboard</span>
+            </a>
+          </li>
+
+          <li class="nav-item menu-items">
+            <a class="nav-link" data-toggle="collapse" href="#ui-config" aria-expanded="false" aria-controls="ui-config">
+              <span class="menu-icon">
+                <i class="mdi mdi-code-braces"></i>
+              </span>
+              <span class="menu-title">Configuration</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ui-config">
+              <ul class="nav flex-column sub-menu">
+                <!-- <li class="nav-item"> <a class="nav-link" href="#">Test1</a></li> -->
+                {{menu_dropdown_config}}
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item menu-items">
+            <a class="nav-link" data-toggle="collapse" href="#ui-ranks" aria-expanded="false" aria-controls="ui-ranks">
+              <span class="menu-icon">
+                <i class="mdi mdi-laptop"></i>
+              </span>
+              <span class="menu-title">Ranks</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ui-ranks">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                  <a class="nav-link" style="color: #00d25b; cursor: pointer;" onclick="">Add rank</a>
+                </li>
+                {{menu_dropdown_ranks}}
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item menu-items">
+            <a class="nav-link" data-toggle="collapse" href="#ui-tags" aria-expanded="false" aria-controls="ui-tags">
+              <span class="menu-icon">
+                <i class="mdi mdi-face"></i>
+              </span>
+              <span class="menu-title">User Tags</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ui-tags">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                  <a class="nav-link" style="color: #00d25b; cursor: pointer;" onclick="">Add user tag</a>
+                </li>
+                {{menu_dropdown_usertags}}
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item menu-items">
+            <a class="nav-link" data-toggle="collapse" href="#ui-players" aria-expanded="false" aria-controls="ui-players">
+              <span class="menu-icon">
+                <i class="mdi mdi-account-multiple"></i>
+              </span>
+              <span class="menu-title">Players</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ui-players">
+              <ul class="nav flex-column sub-menu">
+                <!-- <li class="nav-item"> <a class="nav-link" href="#">Test1</a></li> -->
+                {{menu_dropdown_players}}
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item menu-items">
+            <a class="nav-link" onclick="show_content('about', '');" style="cursor: pointer;">
+              <span class="menu-icon">
+                <i class="mdi mdi-coffee"></i>
+              </span>
+              <span class="menu-title">About</span>
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+
+      <div class="container-fluid page-body-wrapper">
+        <nav class="navbar p-0 fixed-top d-flex flex-row">
+          <div class="navbar-brand-wrapper d-flex d-lg-none align-items-center justify-content-center">
+            <a class="navbar-brand brand-logo-mini" href="#">
+              <h3 style="color: #FFF;margin-bottom: 0px;">PRE</h3>
+            </a>
+          </div>
+          <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize" onclick="$('body').toggleClass('sidebar-icon-only');">
+              <span class="mdi mdi-menu"></span>
+            </button>
+            <!-- <ul class="navbar-nav w-100">
+              <li class="nav-item w-100">
+                <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
+                  <input type="text" class="form-control" placeholder="Search products">
+                </form>
+              </li>
+            </ul> -->
+            <ul class="navbar-nav navbar-nav-right">
+              <li class="nav-item">
+                <div class="btn-group">
+                  <button class="btn btn-danger" onclick="$('#popup-exit').fadeIn();">Exit</button>
+                  <button id="editorsavedatabutton" class="btn btn-primary" onclick="$('#popup-save').fadeIn();">Save</button>
+                  <button id="editorexportdatabutton" class="btn btn-success" onclick="$('#popup-exporting').fadeIn();exportData();">Export</button>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link" id="profileDropdown" href="#">
+                  <div class="navbar-profile">
+                    <img class="img-xs rounded-circle" src="assets/images/PowerRanksLogoRound.png" alt="">
+                    <p class="mb-0 d-none d-sm-block navbar-profile-name">{{server_placeholder}}</p>
+                    <!-- <i class="mdi mdi-menu-down d-none d-sm-block"></i> -->
+                  </div>
+                </a>
+              </li>
+            </ul>
+            <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+              <span class="mdi mdi-format-line-spacing"></span>
+            </button>
+          </div>
+        </nav>
+
+        <div class="main-panel">
+          <div class="content-wrapper">
+
+            <!-- <div class="row">
+              <div class="col-12 grid-margin stretch-card">
+                <div class="card corona-gradient-card">
+                  <div class="card-body py-0 px-0 px-sm-3">
+                    <div class="row align-items-center">
+                      <div class="col-4 col-sm-3 col-xl-2">
+                        <img src="assets/images/dashboard/Group126@2x.png" class="gradient-corona-img img-fluid" alt="">
+                      </div>
+                      <div class="col-5 col-sm-7 col-xl-8 p-0">
+                        <h4 class="mb-1 mb-sm-0">Want even more features?</h4>
+                        <p class="mb-0 font-weight-normal d-none d-sm-block">Check out PowerRanks Web Editor Pro for live editing.</p>
+                      </div>
+                      <div class="col-3 col-sm-2 col-xl-2 pl-0 text-center">
+                        <span>
+                          <a href="https://svenar.nl/powerranks" target="_blank" class="btn btn-outline-light btn-rounded get-started-btn">Upgrade to PRO</a>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
+            <div id="content-dashboard">
+              <div class="row">
+                <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-10">
+                          <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">{{server_players}}</h3>
+                            <p class="text-success ml-2 mb-0 font-weight-medium">{{server_players_percent}}</p>
+                          </div>
+                        </div>
+                        <div class="col-2">
+                          <div class="icon icon-box-success ">
+                            <span class="mdi mdi mdi-account-network icon-item"></span>
+                          </div>
+                        </div>
+                      </div>
+                      <h6 class="text-muted font-weight-normal">Online players</h6>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-10">
+                          <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">{{server_version}}</h3>
+                          </div>
+                        </div>
+                        <div class="col-2">
+                          <div class="icon icon-box-success">
+                            <span class="mdi mdi mdi-settings icon-item"></span>
+                          </div>
+                        </div>
+                      </div>
+                      <h6 class="text-muted font-weight-normal">Server version</h6>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-10">
+                          <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">{{powerranks_num_ranks}} Registered ranks<br />{{powerranks_num_players}} Registered players</h3>
+                          </div>
+                        </div>
+                        <div class="col-2">
+                          <div class="icon icon-box-success">
+                            <span class="mdi mdi-buffer icon-item"></span>
+                          </div>
+                        </div>
+                      </div>
+                      <h6 class="text-muted font-weight-normal">PowerRanks stats</h6>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-10">
+                          <div class="d-flex align-items-center align-self-start">
+                            <h3 class="generaldatetime" class="mb-0"></h3>
+                          </div>
+                        </div>
+                        <div class="col-2">
+                          <div class="icon icon-box-success ">
+                            <span class="mdi mdi-clock icon-item"></span>
+                          </div>
+                        </div>
+                      </div>
+                      <h6 class="text-muted font-weight-normal">Date & Time</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="chartjs-size-monitor">
+                        <div class="chartjs-size-monitor-expand">
+                          <div class=""></div>
+                        </div>
+                        <div class="chartjs-size-monitor-shrink">
+                          <div class=""></div>
+                        </div>
+                      </div>
+                      <h4 class="card-title">Rank distribution</h4>
+                      <canvas id="rank-distribution-chart" class="transaction-chart chartjs-render-monitor" style="display: block; width: 680px; height: 340px;" width="680" height="340"></canvas>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-8 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="d-flex flex-row justify-content-between">
+                        <h4 class="card-title mb-1">Errors <small id="error-log-count">0</small></h4>
+                        <p class="text-muted mb-1">Location</p>
+                      </div>
+                      <div class="row">
+                        <div id="error-log-content" class="col-12"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="content-configuration">
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<h1 class="card-title" style="text-align: center;"><span id="content-configuration-item">-</span> configuration</h1>
+					<div class="card-body">
+                    
+						<h6 class="font-weight-normal">TODO</h6>
+		                	</div>
+                  		</div>
+                	</div>
+		</div>
+            </div>
+
+            <div id="content-ranks">
+              <h1 id="content-ranks-item"></h1>
+            </div>
+
+            <div id="content-usertags">
+              <h1 id="content-usertags-item"></h1>
+            </div>
+
+            <div id="content-players">
+              <h1 id="content-players-item"></h1>
+            </div>
+
+            <div id="content-about">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <h1 class="card-title">About PowerRanks Editor</h1>
+                    <div class="card-body">
+                      <h3>Web-based open-source editor for PowerRanks</h3>
+                      <p>Create/Edit/Remove withing PowerRanks without opening the scary configuration files yourself or using the in-game commands.</p>
+                      <p>With the Web editor for PowerRanks, it becomes easy to change ranks for your server and get notified about any errors on the dashboard.</p>
+                      <p>There is no need to touch YAML configuration files yourself anymore. Just click and drag things around to fit your needs.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="card">
+                    <h1 class="card-title">About PowerRanks</h1>
+                    <div class="card-body">
+                      <h3>PowerRanks is free, but a donation is appreciated</h3>
+                      <p>I have been working on PowerRanks as a hobby for about 6 years now, and I am not planning on stopping anytime soon!</p>
+                      <p>Thousands of hours of work has gone into writing code and providing support to make PowerRanks the best they can be for everyone.</p>
+                      <p>However, as well as the time commitment, maintaining PowerRanks also has a small financial cost on my part.</p>
+                      <p>If you like the work that has been put into making PowerRanks consider helping out a bit by donating any amount.</p>
+                      <script type='text/javascript' src='https://ko-fi.com/widgets/widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support PowerRanks', '#3ea2da', 'Z8Z314C2H'/*"svenar"*/);kofiwidget2.draw();</script>
+                      <a href="https://www.patreon.com/bePatron?u=36780253" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- <h1>About PowerRanks Editor</h1>
+              <h3>Web-based open-source editor for PowerRanks</h3>
+              <p>Create/Edit/Remove withing PowerRanks without opening the scary configuration files yourself or using the in-game commands.</p>
+              <p>With the Web editor for PowerRanks, it becomes easy to change ranks for your server and get notified about any errors on the dashboard.</p>
+              <p>There is no need to touch YAML configuration files yourself anymore. Just click and drag things around to fit your needs.</p>
+              <br />
+              <h1>About PowerRanks Editor</h1>
+              <h3>PowerRanks is free, but a donation is appreciated</h3>
+              <p>I have been working on PowerRanks as a hobby for about 6 years now, and I am not planning on stopping anytime soon!</p>
+              <p>Thousands of hours of work has gone into writing code and providing support to make PowerRanks the best they can be for everyone.</p>
+              <p>However, as well as the time commitment, maintaining PowerRanks also has a small financial cost on my part.</p>
+              <p>If you like the work that has been put into making PowerRanks consider helping out a bit by donating any amount.</p>
+              <script type='text/javascript' src='https://ko-fi.com/widgets/widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support PowerRanks', '#3ea2da', 'Z8Z314C2H'/*"svenar"*/);kofiwidget2.draw();</script>
+							<a href="https://www.patreon.com/bePatron?u=36780253" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script> -->
+            </div>
+
+          </div>
+          <footer class="footer">
+            <div class="d-sm-flex justify-content-center justify-content-sm-between">
+              <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright &copy; <span id="crcurryear"></span> PowerRanks. Theme by <a href="https://www.bootstrapdash.com/" target="_blank">BootstrapDash</a>. All rights reserved.</span>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+    <script src="assets/vendors/js/vendor.bundle.base.js"></script>
+    <script src="assets/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+    <script src="assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+    <script src="assets/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+    <!-- <script src="assets/js/dashboard.js"></script> -->
+    <script src="js/editor.js"></script>
   </body>
 </html>
