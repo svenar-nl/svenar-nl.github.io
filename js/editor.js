@@ -20,10 +20,18 @@ $(document).ready(function() {
         }
     });
 
-    if (getCookie("save_data_size").length > 0) {
-        $("#noidoverlaybtneditorloadcookie").show();
-    } else {
-        $("#noidoverlaybtneditorloadcookie").hide();
+    // if (getCookie("save_data_size").length > 0) {
+    //     $("#noidoverlaybtneditorloadcookie").show();
+    // } else {
+    //     $("#noidoverlaybtneditorloadcookie").hide();
+    // }
+
+    if (getFromLocalStorage("save_data_size") !== null) {
+        if (getFromLocalStorage("save_data_size").length > 0) {
+            $("#noidoverlaybtneditorloadcookie").show();
+        } else {
+            $("#noidoverlaybtneditorloadcookie").hide();
+        }
     }
 
     if (parseURLParams(window.location.href) === undefined || parseURLParams(window.location.href).id === undefined) {
@@ -142,7 +150,7 @@ function replace_menu_dropdown_items(config_data, ranks_data, players_data) {
     }
 
     for (var item in players_data.players) {
-        player_dropdown_items += "<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('players', '" + item + "');\" style=\"cursor: pointer;\">" + players_data.players[item].name + "</a></li>";
+        player_dropdown_items += "<li class=\"nav-item\"><a class=\"nav-link\" onclick=\"show_content('players', '" + item + "');\" style=\"cursor: pointer;\"><img src=\"https://crafatar.com/avatars/" + item + "?size=24&default=MHF_Steve\" alt=\"[plrhead]\" style=\"width: 24px; margin-right: 5px;\" /> " + players_data.players[item].name + "</a></li>";
     }
 
     replaceOnPage("{{menu_dropdown_config}}", config_dropdown_items);
@@ -247,12 +255,16 @@ function check_for_configuration_errors(server_data, config_data, ranks_data, pl
             }
         }
 
-        if (player_usertag.length > 0) {
-            for (var usertag in ranks_data.Usertags) {
-                if (usertag.toLowerCase() == player_usertag.toLowerCase()) {
-                    has_valid_usertag = true;
-                    break;
+        if (player_usertag !== undefined) {
+            if (player_usertag.length > 0) {
+                for (var usertag in ranks_data.Usertags) {
+                    if (usertag.toLowerCase() == player_usertag.toLowerCase()) {
+                        has_valid_usertag = true;
+                        break;
+                    }
                 }
+            } else {
+                has_valid_usertag = true;
             }
         } else {
             has_valid_usertag = true;
@@ -341,7 +353,14 @@ function show_content(page, item) {
         $("#content-usertags").hide();
         $("#content-players").show();
         $("#content-about").hide();
-        $("#content-players-item").text(item);
+
+        $("#content-players-playername").html("<img src=\"https://crafatar.com/avatars/" + item + "?size=36&amp;default=MHF_Steve\" alt=\"[plrhead]\" style=\"width: 36px;margin-right: 5px;margin-top: -10px;\">" + players_data.players[item].name);
+
+        updatePlayerContentGamePreview(item);
+
+        $("#content-players-table-uuid").text(item);
+        $("#content-players-table-playername").text(players_data.players[item].name);
+        $("#content-players-table-playtime").text(players_data.players[item].playtime !== undefined ? players_data.players[item].playtime.toString().toHHMMSS() : "0".toHHMMSS());
     }
 
     if (page.toLowerCase() === "about") {
@@ -354,6 +373,57 @@ function show_content(page, item) {
     }
 }
 
+function updatePlayerContentGamePreview(player_uuid) {
+    // $("#content-players-output-chat").html("<span style=\"color: aqua;\">[" + players_data.players[item].rank + "] </span>" + "<span style=\"color: gold;\">" + players_data.players[item].name + "</span>" + "<span style=\"color: white;\">: </span>" + "<span style=\"color: red;\">Hello!</span>");
+
+    // $("#content-players-output-tablist").html("<img src=\"https://crafatar.com/avatars/" + item + "?size=96&default=MHF_Steve\" alt=\"[plrhead]\" style=\"width: 24px;margin-right: 5px;margin-top: -5px;\">" + 
+    // "<span style=\"color: aqua;\">[" + players_data.players[item].rank + "] </span>" + "<span style=\"color: gold;\">" + players_data.players[item].name + "</span>" + 
+    // "<img src=\"assets/images/ConnectionBars.png\" alt=\"[conn]\" style=\"width: 24px;margin-right: 5px;margin-top: -5px;\">");
+
+    var chat_content = "";
+    var tab_content = "";
+
+    var chat_format = config_data.chat.format;
+    var tab_format = config_data.tablist_modification.format;
+
+    var random_world = server_data.server_worlds.split(",")[Math.round(Math.random() * (server_data.server_worlds.split(",").length - 1))];
+
+    chat_format = chat_format.replace("[world]", random_world);
+    tab_format = tab_format.replace("[world]", random_world);
+
+    chat_format = chat_format.replace("[usertag]", "&r" + (ranks_data.Usertags[players_data.players[player_uuid].usertag] !== undefined && players_data.players[player_uuid].usertag.length > 0 ? ranks_data.Usertags[players_data.players[player_uuid].usertag] : ""));
+    tab_format = tab_format.replace("[usertag]", "&r" + (ranks_data.Usertags[players_data.players[player_uuid].usertag] !== undefined && players_data.players[player_uuid].usertag.length > 0 ? ranks_data.Usertags[players_data.players[player_uuid].usertag] : ""));
+
+    chat_format = chat_format.replace("[prefix]", "&r" + (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.prefix : ""));
+    tab_format = tab_format.replace("[prefix]", "&r" + (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.prefix : ""));
+
+    chat_format = chat_format.replace("[subprefix]", "&r" + ""); // TODO
+    tab_format = tab_format.replace("[subprefix]", "&r" + ""); // TODO
+
+    chat_format = chat_format.replace("[subsuffix]", "&r" + ""); // TODO
+    tab_format = tab_format.replace("[subsuffix]", "&r" + ""); // TODO
+
+    chat_format = chat_format.replace("[player]", (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.nameColor : "") + players_data.players[player_uuid].name);
+    tab_format = tab_format.replace("[player]", (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.nameColor : "") + players_data.players[player_uuid].name);
+
+    chat_format = chat_format.replace("[msg]", (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.chatColor : "") + "Hello!");
+
+    chat_format = chat_format.replace("[suffix]", "&r" + (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.suffix : ""));
+    tab_format = tab_format.replace("[suffix]", "&r" + (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.suffix : ""));
+
+    chat_format = chat_format.replaceAll("  ", " ");
+    tab_format = tab_format.replaceAll("  ", " ");
+
+    chat_content = formatMinecraftColor(chat_format);
+    tab_content = formatMinecraftColor(tab_format);
+
+    tab_content = "<img src=\"https://crafatar.com/avatars/" + player_uuid + "?size=96&default=MHF_Steve\" alt=\"\" style=\"width: 24px;margin-right: 5px;margin-top: -5px;\">" + tab_content;
+    tab_content += "<img src=\"assets/images/ConnectionBars.png\" alt=\"\" style=\"width: 24px;margin-right: 5px;margin-top: -5px;\">";
+
+    $("#content-players-output-chat").html(chat_content);
+    $("#content-players-output-tablist").html(tab_content);
+}
+
 function saveDataCookie() {
     var raw_data = "POWERRANKS@" + btoa(JSON.stringify(server_data) + "\n" + JSON.stringify(config_data) + "\n" + JSON.stringify(ranks_data) + "\n" + JSON.stringify(players_data));
     var splitData = [];
@@ -361,9 +431,14 @@ function saveDataCookie() {
     do{ splitData.push(raw_data.substring(0, split_size)) } 
     while( (raw_data = raw_data.substring(split_size, raw_data.length)) != "" );
 
-    setCookie("save_data_size", splitData.length, 365);
+    // setCookie("save_data_size", splitData.length, 365);
+    // for (var i = 0; i < splitData.length; i++) {
+    //     setCookie("save_data_" + i, splitData[i], 365);
+    // }
+
+    saveToLocalStorage("save_data_size", splitData.length);
     for (var i = 0; i < splitData.length; i++) {
-        setCookie("save_data_" + i, splitData[i], 365);
+        saveToLocalStorage("save_data_" + i, splitData[i]);
     }
 
     $('#popup-save').fadeOut();
@@ -371,10 +446,22 @@ function saveDataCookie() {
 }
 
 function loadDataCookie() {
-    if (getCookie("save_data_size").length > 0) {
+    // if (getCookie("save_data_size").length > 0) {
+    //     var saveData = "";
+    //     for (var i = 0; i < getCookie("save_data_size"); i++) {
+    //         saveData += getCookie("save_data_" + i);
+    //     }
+    //     raw_data_input = saveData.split("@")[1];
+    //     $("#noidoverlay").hide();
+    //     $("#noidoverlayloading").hide();
+    //     $("#noidoverlayinvalidid").hide();
+    //     setup_editor();
+    // }
+
+    if (getFromLocalStorage("save_data_size").length > 0) {
         var saveData = "";
-        for (var i = 0; i < getCookie("save_data_size"); i++) {
-            saveData += getCookie("save_data_" + i);
+        for (var i = 0; i < getFromLocalStorage("save_data_size"); i++) {
+            saveData += getFromLocalStorage("save_data_" + i);
         }
         raw_data_input = saveData.split("@")[1];
         $("#noidoverlay").hide();
@@ -428,6 +515,118 @@ function replaceOnPage(search, replacement) {
     document.getElementsByTagName("body")[0].innerHTML = document.getElementsByTagName("body")[0].innerHTML.replaceAll(search, replacement);
 }
 
+function formatMinecraftColor(input) {
+    var input_split = input.split("&");
+    for (val in input_split) {
+        if (input_split[val].length > 0) {
+            var color = input_split[val][0];
+            var text = input_split[val].substring(1);
+
+            input_split[val] = "<span style=\"" + minecraftColorToCSS(color) + "\">" + text + "</span>";
+        }
+    }
+
+    return input_split.join("");
+}
+
+function minecraftColorToCSS(color) {
+    var colorOut = "";
+    var specialOut = "";
+
+    if (color.match("[0-9a-fA-F]") !== null) {
+        switch (color) {
+            case "0":
+                colorOut = "#000";
+                break;
+            case "1":
+                colorOut = "#0000AA";
+                break;
+            case "2":
+                colorOut = "#00AA00";
+                break;
+            case "3":
+                colorOut = "#00AAAA";
+                break;
+            case "4":
+                colorOut = "#AA0000";
+                break;
+            case "5":
+                colorOut = "#AA00AA";
+                break;
+            case "6":
+                colorOut = "#FFAA00";
+                break;
+            case "7":
+                colorOut = "#AAAAAA";
+                break;
+            case "8":
+                colorOut = "#555555";
+                break;
+            case "9":
+                colorOut = "#5555FF";
+                break;
+            case "a":
+                colorOut = "#55FF55";
+                break;
+            case "b":
+                colorOut = "#55FFFF";
+                break;
+            case "c":
+                colorOut = "#FF5555";
+                break;
+            case "d":
+                colorOut = "#FF55FF";
+                break;
+            case "e":
+                colorOut = "#FFFF55";
+                break;
+            case "f":
+                colorOut = "#FFF";
+                break;
+            default:
+                colorOut = "#FFF";
+                break;
+        }
+    }
+
+    if (color.toLowerCase().match("[lnom]") !== null) {
+        switch (color) {
+            case "l":
+                specialOut = "font-weight: bold;";
+                break;
+            case "n":
+                specialOut = "text-decoration: underline;";
+                break;
+            case "o":
+                specialOut = "font-style: italic;";
+                break;
+            case "m":
+                specialOut = "text-decoration: line-through;";
+                break;
+            default:
+                specialOut = "";
+                break;
+        }
+    }
+
+    var out = "";
+    out += colorOut.length > 0 ? "color: " + colorOut + ";" : "";
+    out += specialOut.length > 0 ? specialOut + ";" : "";
+    return out;
+}
+
+String.prototype.toHHMMSS = function () {
+    var sec_num = parseInt(this, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    return hours+':'+minutes+':'+seconds;
+}
+
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -449,4 +648,12 @@ function getCookie(cname) {
         }
     }
     return "";
+}
+
+function saveToLocalStorage(key, value) {
+    localStorage.setItem(key, value);
+}
+
+function getFromLocalStorage(key) {
+    return localStorage.getItem(key);
 }
