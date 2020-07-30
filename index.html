@@ -69,6 +69,34 @@
                     </div>
                 </div>
             </div>
+            <div id="popup-create-new-rank" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
+                <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+                <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
+                    <h1>Create new rank</h1>
+                    <p>Rank name:</p>
+                    <input id="popup-create-new-rank-input-name" type="text" placeholder="MyAwesomeRank" class="form-control" style="width: 200px;display: unset;" onchange="$('#popup-create-new-rank-button-create').attr('disabled', !this.value.length > 0);"/>
+                    <br />
+                    <br />
+                    <div class="btn-group">
+                        <button class="btn btn-danger" onclick="$('#popup-create-new-rank').fadeOut(); $('#popup-create-new-rank-input-name').val('');">Cancel</button>
+                        <button id="popup-create-new-rank-button-create" class="btn btn-success" onclick="$('#popup-create-new-rank').fadeOut(); createEmptyRank($('#popup-create-new-rank-input-name').val()); $('#popup-create-new-rank-input-name').val('');" disabled="disabled">Create</button>
+                    </div>
+                </div>
+            </div>
+            <div id="popup-create-new-usertag" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
+                <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+                <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
+                    <h1>Create new Usertag</h1>
+                    <p>Usertag name:</p>
+                    <input id="popup-create-new-usertag-input-name" type="text" placeholder="MyAwesomeUsertag" class="form-control" style="width: 200px;display: unset;" onchange="$('#popup-create-new-usertag-button-create').attr('disabled', !this.value.length > 0);"/>
+                    <br />
+                    <br />
+                    <div class="btn-group">
+                        <button class="btn btn-danger" onclick="$('#popup-create-new-usertag').fadeOut(); $('#popup-create-new-usertag-input-name').val('');">Cancel</button>
+                        <button id="popup-create-new-usertag-button-create" class="btn btn-success" onclick="$('#popup-create-new-usertag').fadeOut(); createEmptyUsertag($('#popup-create-new-usertag-input-name').val()); $('#popup-create-new-usertag-input-name').val('');" disabled="disabled">Create</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="noidoverlayloading" style="display: none; position: fixed;width: 100%;height: 100%;z-index: 999999;background-color: #191c24;">
             <div class="loader-demo-box" style="height: 100%;border: 0px solid #191c24 !important;">
@@ -96,6 +124,9 @@
                             <h4 class="card-text">Edit your PowerRanks configuration files in an easy to use web interface.</h4>
                             <p class="card-text">To start a new editor session, use the following command: <strong>/pr webeditor</strong> and enter the ID.<br />Or explore the demo to see the editor's features!</p>
                             <p class="card-text"><small>Requires PowerRanks v1.0 or higher & PowerRanksWebEditor.jar add-on</small></p>
+                            <button class="btn btn-warning" style="width: 100%;" onclick="alert('Download not available yet!');">Download PowerRanksWebEditor.jar</button>
+                            <p>Place PowerRanksWebEditor.jar in the PowerRanks/Addons directory and restart your server.</p>
+                            <p>Then do <code>/pr webeditor</code> to get started</p>
                         </div>
                     </div>
                 </div>
@@ -161,9 +192,9 @@
                         <i class="menu-arrow"></i>
                         </a>
                         <div class="collapse" id="ui-ranks">
-                            <ul class="nav flex-column sub-menu">
+                            <ul id="menu_side_dropdown_ranks" class="nav flex-column sub-menu">
                                 <li class="nav-item">
-                                    <a class="nav-link" style="color: #00d25b; cursor: pointer;" onclick="">Add rank</a>
+                                    <a class="nav-link" style="color: #00d25b; cursor: pointer;" onclick="$('#popup-create-new-rank').fadeIn();">Add rank</a>
                                 </li>
                                 {{menu_dropdown_ranks}}
                             </ul>
@@ -178,9 +209,9 @@
                         <i class="menu-arrow"></i>
                         </a>
                         <div class="collapse" id="ui-tags">
-                            <ul class="nav flex-column sub-menu">
+                            <ul id="menu_side_dropdown_usertags" class="nav flex-column sub-menu">
                                 <li class="nav-item">
-                                    <a class="nav-link" style="color: #00d25b; cursor: pointer;" onclick="">Add user tag</a>
+                                    <a class="nav-link" style="color: #00d25b; cursor: pointer;" onclick="$('#popup-create-new-usertag').fadeIn();">Add user tag</a>
                                 </li>
                                 {{menu_dropdown_usertags}}
                             </ul>
@@ -350,7 +381,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4 grid-margin stretch-card">
+                                <div class="col-md-12 col-lg-5 grid-margin stretch-card">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="chartjs-size-monitor">
@@ -366,7 +397,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-8 grid-margin stretch-card">
+                                <div class="col-md-12 col-lg-7 grid-margin stretch-card">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="d-flex flex-row justify-content-between">
@@ -383,12 +414,10 @@
                         </div>
                         <div id="content-configuration">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="card">
                                         <h1 class="card-title" style="text-align: center;"><span id="content-configuration-item">-</span> configuration</h1>
-                                        <div class="card-body">
-                                            <h6 class="font-weight-normal">TODO</h6>
-                                        </div>
+                                        <div id="content-configuration-body" class="card-body"></div>
                                     </div>
                                 </div>
                             </div>
@@ -431,22 +460,22 @@
                                           </tr>
                                           <tr>
                                             <td>Rank</td>
-                                            <td></td>
+                                            <td id="content-players-table-rank"></td>
                                             <td>Main rank of the player</td>
                                           </tr>
                                           <tr>
                                             <td>Subranks</td>
-                                            <td></td>
+                                            <td id="content-players-table-subranks"></td>
                                             <td>Subranks of the player</td>
                                           </tr>
                                           <tr>
                                             <td>Usertag</td>
-                                            <td></td>
+                                            <td id="content-players-table-usertag"></td>
                                             <td>Self assigned usertag</td>
                                           </tr>
                                           <tr>
                                             <td>Permissions</td>
-                                            <td></td>
+                                            <td id="content-players-table-permissions"></td>
                                             <td>Player specific permissions</td>
                                           </tr>
                                         </tbody>
@@ -482,7 +511,7 @@
                                         <h1 class="card-title">About PowerRanks Editor</h1>
                                         <div class="card-body">
                                             <h3>Web-based open-source editor for PowerRanks</h3>
-                                            <p>Create/Edit/Remove withing PowerRanks without opening the scary configuration files yourself or using the in-game commands.</p>
+                                            <p>Create/Edit/Remove within PowerRanks without opening the scary configuration files yourself or using the in-game commands.</p>
                                             <p>With the Web editor for PowerRanks, it becomes easy to change ranks for your server and get notified about any errors on the dashboard.</p>
                                             <p>There is no need to touch YAML configuration files yourself anymore. Just click and drag things around to fit your needs.</p>
                                         </div>
@@ -493,7 +522,7 @@
                                         <h1 class="card-title">About PowerRanks</h1>
                                         <div class="card-body">
                                             <h3>PowerRanks is free, but a donation is appreciated</h3>
-                                            <p>I have been working on PowerRanks as a hobby for about 6 years now, and I am not planning on stopping anytime soon!</p>
+                                            <p>I have been working on PowerRanks as a hobby for about <span id="prdevtime"></span> years now, and I am not planning on stopping anytime soon!</p>
                                             <p>Thousands of hours of work has gone into writing code and providing support to make PowerRanks the best they can be for everyone.</p>
                                             <p>However, as well as the time commitment, maintaining PowerRanks also has a small financial cost on my part.</p>
                                             <p>If you like the work that has been put into making PowerRanks consider helping out a bit by donating any amount.</p>

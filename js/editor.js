@@ -90,7 +90,7 @@ $(document).ready(function() {
     }
 
     $("#crcurryear").text(new Date().getFullYear());
-      
+    $("#prdevtime").text(new Date().getFullYear() - 2014);
 });
 
 function setup_editor() {
@@ -323,7 +323,9 @@ function show_content(page, item) {
         $("#content-usertags").hide();
         $("#content-players").hide();
         $("#content-about").hide();
-        $("#content-configuration-item").text(item);
+        $("#content-configuration-item").text(item.replaceAll("_", " "));
+
+        updateConfigContentBody(item);
     }
 
     if (page.toLowerCase() === "ranks") {
@@ -343,7 +345,24 @@ function show_content(page, item) {
         $("#content-usertags").show();
         $("#content-players").hide();
         $("#content-about").hide();
-        $("#content-usertags-item").text(item);
+
+        var content = "<div class=\"row\">";
+        content += "<div class=\"col-md-12\">";
+        content += "<div class=\"card\">";
+        content += "<h1 class=\"card-title\" style=\"margin-left: 20px;margin-top: 20px;text-align: center;\">" + item + "</h1>";
+        content += "<div class=\"card-body\">";
+        content += "<table class=\"table table-bordered\"><thead><tr><th scope=\"col\">Key</th><th scope=\"col\">Value</th><th scope=\"col\">Description</th></tr></thead><tbody>";
+        content += "<tr><td>Format</td><td>";
+        content += "<input class=\"form-control\" type=\"text\" value=\"" + ranks_data.Usertags[item] + "\" onchange=\"ranks_data.Usertags['" + item + "'] = this.value; $('.usertag-format-preview').html(formatMinecraftColor(ranks_data.Usertags['" + item + "']));\" style=\"width: 100%;\">";
+        content += "</td><td>Change the look of this usertag<br /><br />Preview: <span class=\"usertag-format-preview\" style=\"background-color: #5f4225;\"></span></td></tr>";
+        content += "</tbody></table>";
+        content += "</div>";
+        content += "</div>";
+        content += "</div>";
+        content += "</div>";
+        content += "";
+        $("#content-usertags-item").html(content);
+        $('.usertag-format-preview').html(formatMinecraftColor(ranks_data.Usertags[item]));
     }
 
     if (page.toLowerCase() === "players") {
@@ -361,6 +380,10 @@ function show_content(page, item) {
         $("#content-players-table-uuid").text(item);
         $("#content-players-table-playername").text(players_data.players[item].name);
         $("#content-players-table-playtime").text(players_data.players[item].playtime !== undefined ? players_data.players[item].playtime.toString().toHHMMSS() : "0".toHHMMSS());
+        $("#content-players-table-rank").text(players_data.players[item].rank);
+        $("#content-players-table-subranks").text(players_data.players[item].subranks);
+        $("#content-players-table-usertag").text(players_data.players[item].usertag);
+        $("#content-players-table-permissions").text(players_data.players[item].permissions);
     }
 
     if (page.toLowerCase() === "about") {
@@ -370,6 +393,132 @@ function show_content(page, item) {
         $("#content-usertags").hide();
         $("#content-players").hide();
         $("#content-about").show();
+    }
+}
+
+function updateConfigContentBody(config_item) {
+    var body = "<table class=\"table table-bordered\"><thead><tr><th scope=\"col\">Key</th><th scope=\"col\">Value</th><th scope=\"col\">Description</th></tr></thead><tbody>";
+    var error = false;
+
+    switch(config_item.toLowerCase()) {
+        case "chat":
+            body += "<tr>";
+            body += "<td>Enabled</td>";
+            body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-chat-enabled\" type=\"checkbox\" " + (config_data.chat.enabled ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-chat-enabled').attr('checked', !$('.checkbox-chat-enabled').attr('checked')); config_data.chat.enabled = !!$('.checkbox-chat-enabled').attr('checked');\"></span></td>";
+            body += "<td>Enable or disable modification of the chat format</td>";
+            body += "</tr>";
+
+            body += "<tr>";
+            body += "<td>Format</td>";
+            body += "<td><input class=\"form-control\" type=\"text\" value=\"" + config_data.chat.format + "\" onchange=\"config_data.chat.format = this.value;\" style=\"width: 100%;\"/></td>";
+            body += "<td>Change the chat format</td>";
+            body += "</tr>";
+            break;
+
+        case "tablist_modification":
+            body += "<tr>";
+            body += "<td>Enabled</td>";
+            body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-tablist-modification-enabled\" type=\"checkbox\" " + (config_data.tablist_modification.enabled ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-tablist-modification-enabled').attr('checked', !$('.checkbox-tablist-modification-enabled').attr('checked')); config_data.tablist_modification.enabled = !!$('.checkbox-tablist-modification-enabled').attr('checked');\"></span></td>";
+            body += "<td>Enable or disable modification of the tab(player) list format</td>";
+            body += "</tr>";
+    
+            body += "<tr>";
+            body += "<td>Format</td>";
+            body += "<td><input class=\"form-control\" type=\"text\" value=\"" + config_data.tablist_modification.format + "\" onchange=\"config_data.tablist_modification.format = this.value;\" style=\"width: 100%;\"/></td>";
+            body += "<td>Change the tab(player) list format</td>";
+            body += "</tr>";
+            break;
+
+        case "build_modification":
+            body += "<tr>";
+            body += "<td>Enabled</td>";
+            body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-build-modification-enabled\" type=\"checkbox\" " + (config_data.build_modification.enabled ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-build-modification-enabled').attr('checked', !$('.checkbox-build-modification-enabled').attr('checked')); config_data.build_modification.enabled = !!$('.checkbox-build-modification-enabled').attr('checked');\"></span></td>";
+            body += "<td>Enable or disable the use of <code>build:</code> parameter in <code>Ranks.yml</code></td>";
+            body += "</tr>";
+            break;
+
+        case "signs":
+            body += "<tr>";
+            body += "<td>Enabled</td>";
+            body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-signs-enabled\" type=\"checkbox\" " + (config_data.signs.enabled ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-signs-enabled').attr('checked', !$('.checkbox-signs-enabled').attr('checked')); config_data.signs.enabled = !!$('.checkbox-signs-enabled').attr('checked');\"></span></td>";
+            body += "<td>Enable or disable tue use of PowerRanks signs. <br /><small>When enabled put <code><small>PowerRanks</small></code> on the first line followed by a command on the second line</small></td>";
+            body += "</tr>";
+    
+            body += "<tr>";
+            body += "<td>Signs TitleFormat</td>";
+            body += "<td><input class=\"form-control\" type=\"text\" value=\"" + config_data.signs.title_format + "\" onchange=\"config_data.signs.title_format = this.value; $('.signs-title-format-preview').html(formatMinecraftColor(config_data.signs.title_format.replace('%plugin_name%', 'PowerRanks')));\" style=\"width: 100%;\"/></td>";
+            body += "<td>Change the title format on signs <span class=\"signs-title-format-preview\" style=\"background-color: #5f4225;\"></span></td>";
+            body += "</tr>";
+            break;
+
+        case "plugin_hook":
+            if (calculatePowerRanksVersionFromString(server_data.powerranks_version) >= calculatePowerRanksVersionFromString("1.3")) {
+                body += "<tr>";
+                body += "<td>Vault Economy</td>";
+                body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-vault-economy-enabled\" type=\"checkbox\" " + (config_data.plugin_hook.vault_economy ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-vault-economy-enabled').attr('checked', !$('.checkbox-vault-economy-enabled').attr('checked')); config_data.plugin_hook.vault_economy = !!$('.checkbox-vault-economy-enabled').attr('checked');\"></span></td>";
+                body += "<td>Enable or disable the use of <code>Vault Economy</code></td>";
+                body += "</tr>";
+
+                body += "<tr>";
+                body += "<td>Vault Permissions</td>";
+                body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-vault-permissions-enabled\" type=\"checkbox\" " + (config_data.plugin_hook.vault_permissions ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-vault-permissions-enabled').attr('checked', !$('.checkbox-vault-permissions-enabled').attr('checked')); config_data.plugin_hook.vault_permissions = !!$('.checkbox-vault-permissions-enabled').attr('checked');\"></span></td>";
+                body += "<td>Enable or disable the use of <code>Vault Permissions</code></td>";
+                body += "</tr>";
+            } else {
+                body += "<tr>";
+                body += "<td>Vault</td>";
+                body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-vault-enabled\" type=\"checkbox\" " + (config_data.plugin_hook.vault ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-vault-enabled').attr('checked', !$('.checkbox-vault-enabled').attr('checked')); config_data.plugin_hook.vault = !!$('.checkbox-vault-enabled').attr('checked');\"></span></td>";
+                body += "<td>Enable or disable the use of <code>Vault Economy</code></td>";
+                body += "</tr>";
+            }
+
+            body += "<tr>";
+            body += "<td>PlaceholderAPI</td>";
+            body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-placeholderapi-enabled\" type=\"checkbox\" " + (config_data.plugin_hook.placeholderapi ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-placeholderapi-enabled').attr('checked', !$('.checkbox-placeholderapi-enabled').attr('checked')); config_data.plugin_hook.placeholderapi = !!$('.checkbox-placeholderapi-enabled').attr('checked');\"></span></td>";
+            body += "<td>Enable or disable the use of <code>PlaceholderAPI</code></td>";
+            body += "</tr>";
+
+            body += "<tr>";
+            body += "<td>DeluxeTags</td>";
+            body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-deluxetags-enabled\" type=\"checkbox\" " + (config_data.plugin_hook.deluxetags ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-deluxetags-enabled').attr('checked', !$('.checkbox-deluxetags-enabled').attr('checked')); config_data.plugin_hook.deluxetags = !!$('.checkbox-deluxetags-enabled').attr('checked');\"></span></td>";
+            body += "<td>Enable or disable the use of <code>DeluxeTags</code><br /><small>Warning: When enabled this will disable the UserTags in PowerRanks in favour of DeluxeTags</small></td>";
+            body += "</tr>";
+            break;
+
+        case "updates":
+            body += "<tr>";
+            body += "<td>Enable update checking</td>";
+            body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-enable-update-checking-enabled\" type=\"checkbox\" " + (config_data.updates.enable_update_checking ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-enable-update-checking-enabled').attr('checked', !$('.checkbox-enable-update-checking-enabled').attr('checked')); config_data.updates.enable_update_checking = !!$('.checkbox-enable-update-checking-enabled').attr('checked');\"></span></td>";
+            body += "<td>Enable automatic update checking, a notification will be shown in your server console when a update is available</td>";
+            body += "</tr>";
+
+            body += "<tr>";
+            body += "<td>Enable automatic update download</td>";
+            body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-enable-automatic-update-download\" type=\"checkbox\" " + (config_data.updates.automatic_download_updates ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-enable-automatic-update-download').attr('checked', !$('.checkbox-enable-automatic-update-download').attr('checked')); config_data.updates.automatic_download_updates = !!$('.checkbox-enable-automatic-update-download').attr('checked');\"></span></td>";
+            body += "<td>Enable automatic update download, requires <code>Enable update checking</code> to be enabled<br /><small>When an update is downloaded, PowerRanks will be disabled until the server is restarted!</small></td>";
+            body += "</tr>";
+
+            body += "<tr>";
+            body += "<td>Enable automatic config file updater</td>";
+            body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-enable-automatic-config-update\" type=\"checkbox\" " + (config_data.updates.automatic_update_config_files ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-enable-automatic-config-update').attr('checked', !$('.checkbox-enable-automatic-config-update').attr('checked')); config_data.updates.automatic_update_config_files = !!$('.checkbox-enable-automatic-config-update').attr('checked');\"></span></td>";
+            body += "<td>When enabled PowerRanks will automatically update the configuration files to the latest version<br /><small>It is recommended to leave this on</small></td>";
+            body += "</tr>";
+            break;
+
+        default:
+            body = "<h6 style=\"text-align: center;\">Unknown config option.</h6>";
+            error = true;
+            break;
+    }
+
+    if (!error) {
+        body += "</tbody></table>";
+    }
+
+    $("#content-configuration-body").html(body);
+
+    if (config_item.toLowerCase() == "signs") {
+        $('.signs-title-format-preview').html(formatMinecraftColor(config_data.signs.title_format.replace('%plugin_name%', 'PowerRanks')));
     }
 }
 
@@ -472,19 +621,35 @@ function loadDataCookie() {
 }
 
 function exportData() {
+    console.log("Exporting...");
     var raw_data = "POWERRANKS@" + btoa(JSON.stringify(server_data) + "\n" + JSON.stringify(config_data) + "\n" + JSON.stringify(ranks_data) + "\n" + JSON.stringify(players_data));
 
-    $.post(file_base_url, {text: raw_data}, function(data) {
-        $("#popup-exporting").fadeOut();
-        $("#popup-export-done").fadeIn();
-        $("#export-id").text(data["key"]);
-        $("#export-command").text("/pr webeditor load " + data["key"]);
-    })
-    .fail(function(data) {
-        alert("There was a error exporting your data, please save and try again in a few minutes.");
-        $("#popup-exporting").fadeOut();
-    })
+    const API_ENDPOINT = file_base_url;
+    const request = new XMLHttpRequest();
+    const formData = new FormData();
+
+    request.open("POST", API_ENDPOINT, true);
+    request.onreadystatechange = () => {
+        console.log(request);
+        console.log(request.responseText);
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                var data = JSON.parse(request.responseText);
+                $("#popup-exporting").fadeOut();
+                $("#popup-export-done").fadeIn();
+                $("#export-id").text(data["key"]);
+                $("#export-command").text("/pr webeditor load " + data["key"]);
+            } else {
+                alert("There was a error exporting your data, please save and try again in a few minutes.");
+                $("#popup-exporting").fadeOut();
+            }
+        }
+    };
+    formData.append("file", new Blob([raw_data], {type: "text/plain"}));
+    request.send(formData);
+
 }
+
 
 function parseURLParams(url) {
     var queryStart = url.indexOf("?") + 1,
@@ -656,4 +821,38 @@ function saveToLocalStorage(key, value) {
 
 function getFromLocalStorage(key) {
     return localStorage.getItem(key);
+}
+
+function calculatePowerRanksVersionFromString(input) {
+    var output = 0;
+    input = input.replaceAll("[a-zA-Z ]", "");
+    var input_split = input.split(".");
+
+    var calcString = "1000000";
+    for (var i = 0; i < input_split.length; i++) {
+        if (input_split[i].length != 0) {
+            var num = parseInt(input_split[i]) * parseInt(calcString);
+            if (calcString.charAt(calcString.length - 1) == '0') {
+                calcString = calcString.substring(0, calcString.length - 1);
+            }
+            output += num;
+        }
+    }
+    
+    return output;
+}
+
+function createEmptyRank(name) {
+    if (name.length == 0) return;
+    ranks_data.Groups[name] = {permissions: [], inheritance: [], build: true, chat: {prefix: "&r[&7" + name + "&r]", suffix: "", chatColor: "&f", nameColor: "&f"}, level: {promote: "", demote: ""}, gui: {icon: "stick"}, economy: {buyable: [], cost: 0}};
+    $("#menu_side_dropdown_ranks").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + name + "');\" style=\"cursor: pointer;\">" + name + "</a></li>");
+    show_content('ranks', name);
+}
+
+function createEmptyUsertag(name) {
+    if (name.length == 0) return;
+    if (typeof(ranks_data.Usertags) === "string") ranks_data.Usertags = {};
+    ranks_data.Usertags[name] = "&r[&7" + name + "&r]";
+    $("#menu_side_dropdown_usertags").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + name + "');\" style=\"cursor: pointer;\">" + name + "</a></li>");
+    show_content('usertags', name);
 }
