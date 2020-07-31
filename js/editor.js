@@ -91,6 +91,11 @@ $(document).ready(function() {
 
     $("#crcurryear").text(new Date().getFullYear());
     $("#prdevtime").text(new Date().getFullYear() - 2014);
+
+    
+    $(window).resize(function() {
+        $("#content-players-output-div-tablist").css("bottom", $("#content-players-output-image").height());
+    });
 });
 
 function setup_editor() {
@@ -351,7 +356,8 @@ function show_content(page, item) {
         content += "<div class=\"card\">";
         content += "<h1 class=\"card-title\" style=\"margin-left: 20px;margin-top: 20px;text-align: center;\">" + item + "</h1>";
         content += "<div class=\"card-body\">";
-        content += "<table class=\"table table-bordered\"><thead><tr><th scope=\"col\">Key</th><th scope=\"col\">Value</th><th scope=\"col\">Description</th></tr></thead><tbody>";
+        content += "<button class=\"btn btn-danger\" onclick=\"delete ranks_data.Usertags['" + item + "']; $('#menu_side_dropdown_usertags').children().remove(':contains(" + item + ")'); show_content('dashboard', '');\" style=\"left: 40%;width: 20%;position: absolute;\">Delete</button>";
+        content += "<table class=\"table table-bordered\" style=\"margin-top: 45px;\"><thead><tr><th scope=\"col\">Key</th><th scope=\"col\">Value</th><th scope=\"col\">Description</th></tr></thead><tbody>";
         content += "<tr><td>Format</td><td>";
         content += "<input class=\"form-control\" type=\"text\" value=\"" + ranks_data.Usertags[item] + "\" onchange=\"ranks_data.Usertags['" + item + "'] = this.value; $('.usertag-format-preview').html(formatMinecraftColor(ranks_data.Usertags['" + item + "']));\" style=\"width: 100%;\">";
         content += "</td><td>Change the look of this usertag<br /><br />Preview: <span class=\"usertag-format-preview\" style=\"background-color: #5f4225;\"></span></td></tr>";
@@ -380,10 +386,136 @@ function show_content(page, item) {
         $("#content-players-table-uuid").text(item);
         $("#content-players-table-playername").text(players_data.players[item].name);
         $("#content-players-table-playtime").text(players_data.players[item].playtime !== undefined ? players_data.players[item].playtime.toString().toHHMMSS() : "0".toHHMMSS());
-        $("#content-players-table-rank").text(players_data.players[item].rank);
-        $("#content-players-table-subranks").text(players_data.players[item].subranks);
         $("#content-players-table-usertag").text(players_data.players[item].usertag);
-        $("#content-players-table-permissions").text(players_data.players[item].permissions);
+
+        var select_content_player_rank = "";
+        for (var rank in ranks_data.Groups) {
+            select_content_player_rank += "<option value=\"" + rank + "\" " + (rank === players_data.players[item].rank ? "selected" : "") + ">" + rank + "</option>";
+        }
+        if (!select_content_player_rank.includes("selected")) {
+            select_content_player_rank += "<option value=\"" + players_data.players[item].rank + "\" selected style=\"color: #b12121\">" + players_data.players[item].rank + "</option>";
+        }
+        $("#content-players-table-rank").html(select_content_player_rank);
+        $("#content-players-table-rank").attr("onchange", "players_data.players['" + item + "'].rank = this.selectedOptions[0].value; show_content('players', '" + item + "');");
+
+        var select_content_player_usertag = "<option value=\"\">None</option>";
+        for (var usertag in ranks_data.Usertags) {
+            select_content_player_usertag += "<option value=\"" + usertag + "\" " + (usertag === players_data.players[item].usertag ? "selected" : "") + ">" + usertag + "</option>";
+        }
+        if (!select_content_player_usertag.includes("selected")) {
+            select_content_player_usertag += "<option value=\"" + players_data.players[item].usertag + "\" selected style=\"color: #b12121\">" + players_data.players[item].usertag + "</option>";
+        }
+        $("#content-players-table-usertag").html(select_content_player_usertag);
+        $("#content-players-table-usertag").attr("onchange", "players_data.players['" + item + "'].usertag = this.selectedOptions[0].value; show_content('players', '" + item + "');");
+
+        var table_content_subranks = "";
+        if (typeof(players_data.players[item].subranks) !== "string") {
+            for (var key in players_data.players[item].subranks) {
+                if (players_data.players[item].subranks[key].worlds.length == 0) {
+                    players_data.players[item].subranks[key].worlds.push("All");
+                } else {
+                    var toRemove = "";
+                    for (var i = 0; i < players_data.players[item].subranks[key].worlds.length; i++) {
+                        var world = players_data.players[item].subranks[key].worlds[i];
+                        if (world.toLowerCase() === "all") {
+                            toRemove = world;
+                            break;
+                        }
+                    }
+                    if (toRemove.length > 0) {
+                        players_data.players[item].subranks[key].worlds.splice( $.inArray(toRemove, players_data.players[item].subranks[key].worlds), 1);
+                    }
+                }
+
+                table_content_subranks += "<tr>";
+                table_content_subranks += "<td rowspan=\"5\">" + key + "</td>";
+                table_content_subranks += "<td>Use Prefix</td>";
+                table_content_subranks += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-players-subranks-" + key + "-use-prefix\" type=\"checkbox\" " + (players_data.players[item].subranks[key].use_prefix ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-players-subranks-" + key + "-use-prefix').attr('checked', !$('.checkbox-players-subranks-" + key + "-use-prefix').attr('checked')); players_data.players['" + item + "'].subranks['" + key + "'].use_prefix = !!$('.checkbox-players-subranks-" + key + "-use-prefix').attr('checked');\"></span></td>";
+                table_content_subranks += "<td>Show the subrank's prefix before the player's name</td>";
+                table_content_subranks += "</tr>";
+                table_content_subranks += "<tr>";
+                table_content_subranks += "<td>Use Suffix</td>";
+                table_content_subranks += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-players-subranks-" + key + "-use-suffix\" type=\"checkbox\" " + (players_data.players[item].subranks[key].use_suffix ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-players-subranks-" + key + "-use-suffix').attr('checked', !$('.checkbox-players-subranks-" + key + "-use-suffix').attr('checked')); players_data.players['" + item + "'].subranks['" + key + "'].use_suffix = !!$('.checkbox-players-subranks-" + key + "-use-suffix').attr('checked');\"></span></td>";
+                table_content_subranks += "<td>Show the subrank's suffix after the player's name</td>";
+                table_content_subranks += "</tr>";
+                table_content_subranks += "<tr>";
+                table_content_subranks += "<td>Use Permissions</td>";
+                table_content_subranks += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-players-subranks-" + key + "-use-permissions\" type=\"checkbox\" " + (players_data.players[item].subranks[key].use_permissions ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-players-subranks-" + key + "-use-permissions').attr('checked', !$('.checkbox-players-subranks-" + key + "-use-permissions').attr('checked')); players_data.players['" + item + "'].subranks['" + key + "'].use_permissions = !!$('.checkbox-players-subranks-" + key + "-use-permissions').attr('checked');\"></span></td>";
+                table_content_subranks += "<td>Give the player this subrank's permissions</td>";
+                table_content_subranks += "</tr>";
+                table_content_subranks += "<tr>";
+                table_content_subranks += "<td>Worlds</td>";
+                table_content_subranks += "<td>";
+                table_content_subranks += "<select id=\"content-players-table-subranks-select-" + key + "-worlds\" class=\"form-select\">";
+                for (var i = 0; i < server_data.server_worlds.split(",").length; i++) {
+                    var world = server_data.server_worlds.split(",")[i];
+                    if (!players_data.players[item].subranks[key].worlds.includes(world)) {
+                        table_content_subranks += "<option value=\"" + world + "\">" + world + "</option>";
+                    }
+                }
+                table_content_subranks += "</select>";
+                table_content_subranks += "<button class=\"btn btn-success\" style=\"width: 100%;margin-bottom: 25px;\" onclick=\"if ($('#content-players-table-subranks-select-" + key + "-worlds').val() !== null) {players_data.players['" + item + "'].subranks['" + key + "'].worlds.push($('#content-players-table-subranks-select-" + key + "-worlds').val()); show_content('players', '" + item + "');}\">Add World</button>";
+                table_content_subranks += "<div>";
+                for (var i = 0; i < players_data.players[item].subranks[key].worlds.length; i++) {
+                    var world = players_data.players[item].subranks[key].worlds[i];
+                    table_content_subranks += "<p style=\"border-bottom: 1px solid #2c2e33;margin-bottom: 25px;\">";
+                    table_content_subranks += world;
+                    if (world.toLowerCase() !== "all") {
+                        table_content_subranks += "<button class=\"btn btn-danger\" style=\"float: right;margin-top: -15px;\" onclick=\"players_data.players['" + item + "'].subranks['" + key + "'].worlds.splice( $.inArray('" + world + "', players_data.players['" + item + "'].subranks['" + key + "'].worlds), 1); show_content('players', '" + item + "');\">Remove</button>";
+                    }
+                    table_content_subranks += "</p>";
+                }
+                table_content_subranks += "</div>";
+                table_content_subranks += "</td>";
+                table_content_subranks += "<td>In what worlds show the player have this subrank</td>";
+                table_content_subranks += "</tr>";
+                table_content_subranks += "<tr>";
+                table_content_subranks += "<td>Delete?</td>";
+                table_content_subranks += "<td><button class=\"btn btn-danger\" onclick=\"delete players_data.players['" + item + "'].subranks['" + key + "']; show_content('players', '" + item + "');\">Delete</button></td>";
+                table_content_subranks += "<td>Delete this subrank from the player</td>";
+                table_content_subranks += "</tr>";
+            }
+        }
+        $("#content-players-table-subranks").html(table_content_subranks);
+
+        var select_content_player_subranks_add = "";
+        for (var rank in ranks_data.Groups) {
+            if (typeof(players_data.players[item].subranks) === "string") {
+                players_data.players[item].subranks = {};
+            }
+            if (!(rank in players_data.players[item].subranks) && rank !== players_data.players[item].rank) {
+                select_content_player_subranks_add += "<option value=\"" + rank + "\">" + rank + "</option>";
+            }
+        }
+        $("#content-players-table-subranks-select-add").html(select_content_player_subranks_add);
+        $("#content-players-table-subranks-button-add").attr("onclick", "if ($('#content-players-table-subranks-select-add').val() !== null) {players_data.players['" + item + "'].subranks[$('#content-players-table-subranks-select-add').val()] = {use_prefix: true, use_suffix: true, use_permissions: true, worlds: []}; show_content('players', '" + item + "');}");
+
+        $("#content-players-output-div-tablist").css("bottom", $("#content-players-output-image").height());
+
+        $("#content-players-table-permissions-button-add").attr("onclick", "if ($('#content-players-table-permissions-input-add').val().length > 0) {if (!players_data.players['" + item + "'].permissions.includes($('#content-players-table-permissions-input-add').val()) && !players_data.players['" + item + "'].permissions.includes('-' + $('#content-players-table-permissions-input-add').val())) {players_data.players['" + item + "'].permissions.push($('#content-players-table-permissions-input-add').val()); $('#content-players-table-permissions-input-add').val(''); show_content('players', '" + item + "');}$('#content-players-table-permissions-input-add').val('');}");
+
+        var content_players_table_permissions = "";
+
+        for (var i = 0; i < players_data.players[item].permissions.length; i++) {
+            var permission = players_data.players[item].permissions[i];
+
+            content_players_table_permissions += "<tr>";
+            content_players_table_permissions += "<td>" + permission + "</td>";
+            content_players_table_permissions += "<td>";
+            content_players_table_permissions += "<button class=\"btn btn-" + (permission[0] === "-" ? "warning" : "success") + "\" onclick=\"togglePlayerPermission(this, '" + item + "', '" + permission + "'); show_content('players', '" + item + "');\">" + (permission[0] === "-" ? "Disallowed" : "Allowed") + "</button>";
+            content_players_table_permissions += "<button class=\"btn btn-danger\" style=\"float: right;\" onclick=\"players_data.players['" + item + "'].permissions.splice( $.inArray('" + permission + "', players_data.players['" + item + "'].permissions), 1); show_content('players', '" + item + "');\">Remove</button>";
+            content_players_table_permissions += "</td>";
+            content_players_table_permissions += "</tr>";
+        }
+
+        //<td>
+    // <button class="btn btn-warning" onclick="$(this).toggle('btn-success').toggle('btn-warning')" style="/* display: none; */">Allowed</button>
+
+    // 
+    // </td>
+        $("#content-players-table-permissions").html(content_players_table_permissions);
+
+        autocomplete(document.getElementById("content-players-table-permissions-input-add"), server_data.server_permissions.split(","));
     }
 
     if (page.toLowerCase() === "about") {
@@ -853,6 +985,23 @@ function createEmptyUsertag(name) {
     if (name.length == 0) return;
     if (typeof(ranks_data.Usertags) === "string") ranks_data.Usertags = {};
     ranks_data.Usertags[name] = "&r[&7" + name + "&r]";
-    $("#menu_side_dropdown_usertags").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + name + "');\" style=\"cursor: pointer;\">" + name + "</a></li>");
+    $("#menu_side_dropdown_usertags").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('usertags', '" + name + "');\" style=\"cursor: pointer;\">" + name + "</a></li>");
     show_content('usertags', name);
+}
+
+function togglePlayerPermission(_this, uuid, permission) {
+    var button = $(_this);
+    for (var i = 0; i < players_data.players[uuid].permissions.length; i++) {
+        if (players_data.players[uuid].permissions[i].includes(permission)) {
+            if (players_data.players[uuid].permissions[i][0] === "-") {
+                players_data.players[uuid].permissions[i] = players_data.players[uuid].permissions[i].replace("-", "");
+                button.addClass("btn-success").removeClass("btn-warning");
+                button.text("Allowed");
+            } else {
+                players_data.players[uuid].permissions[i] = "-" + players_data.players[uuid].permissions[i];
+                button.addClass("btn-warning").removeClass("btn-success");
+                button.text("Disllowed");
+            }
+        }
+    }
 }

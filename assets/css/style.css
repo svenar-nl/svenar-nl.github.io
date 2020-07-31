@@ -9795,23 +9795,7 @@ input[type="button"].btn-block {
     left: 0; }
   .dropdown-menu-md-right {
     right: 0;
-    left: auto; } }
-
-@media (min-width: 992px) {
-  .dropdown-menu-lg-left {
-    right: auto;
-    left: 0; }
-  .dropdown-menu-lg-right {
-    right: 0;
-    left: auto; } }
-
-@media (min-width: 1200px) {
-  .dropdown-menu-xl-left {
-    right: auto;
-    left: 0; }
-  .dropdown-menu-xl-right {
-    right: 0;
-    left: auto; } }
+    left: auto;margin-bottom: 25px; } }
 
 .dropup .dropdown-menu {
   top: auto;
@@ -21133,6 +21117,7 @@ div.tagsinput {
   height: 25px;
   width: 25px;
   background-color: #eee;
+  border-radius: 5px;
 }
 
 /* On mouse-over, add a grey background color */
@@ -21168,4 +21153,67 @@ div.tagsinput {
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+.col-md-6 {
+  margin-bottom: 25px;
+}
+
+.form-select {
+  display: block;
+    width: 100%;
+    height: calc(1.5em + .75rem + 2px);
+    padding: .375rem 1.75rem .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #6c7293;
+    /* vertical-align: middle; */
+    background-color: #191c24;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right .75rem center;
+    background-size: 16px 12px;
+    border: 1px solid #2c2e33;
+    border-radius: .25rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.autocomplete {
+  position: relative;
+  display: inline-block;
+}
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #2c2e33;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+  color: #6c7293;
+  margin-top: -54px;
+}
+
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #191c24; 
+  border-bottom: 1px solid #2c2e33; 
+}
+
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+  background-color: #3b404c; 
+}
+
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+  background-color: #3b404c !important; 
+  color: #6c7293; 
 }
