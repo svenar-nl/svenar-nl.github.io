@@ -10,6 +10,16 @@
             
             gtag('config', 'UA-172992272-1');
         </script>
+        <script>
+            (function(h,o,t,j,a,r){
+                h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+                h._hjSettings={hjid:1927438,hjsv:6};
+                a=o.getElementsByTagName('head')[0];
+                r=o.createElement('script');r.async=1;
+                r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+                a.appendChild(r);
+            })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+        </script>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>PowerRanks Editor</title>
@@ -452,6 +462,10 @@
                                     <div class="card">
                                         <h1 id="content-ranks-item" class="card-title" style="margin-left: 20px;margin-top: 20px;text-align: center;">-</h1>
                                         <div class="card-body">
+                                            <div style="left: 25%;width: 50%;position: relative;">
+                                                <button id="content-ranks-table-rank-button-remove" class="btn btn-danger" style="width: 100%; margin-bottom: 25px;">Delete rank</button>
+                                                <br />
+                                            </div>
                                             <table class="table table-bordered">
                                                 <thead>
                                                   <tr>
@@ -461,6 +475,122 @@
                                                   </tr>
                                                 </thead>
                                                 <tbody>
+                                                    <tr>
+                                                        <td>Name</td>
+                                                        <td id="content-ranks-table-rank-name"></td>
+                                                        <td>The name of this rank</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Prefix</td>
+                                                        <td id="content-ranks-table-rank-prefix"></td>
+                                                        <td>What should show up before the player's name?<br />Preview: <span id="content-ranks-table-rank-prefix-preview" style="background-color: #5f4225;"></span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Suffix</td>
+                                                        <td id="content-ranks-table-rank-suffix"></td>
+                                                        <td>What should show up after the player's name?<br />Preview: <span id="content-ranks-table-rank-suffix-preview" style="background-color: #5f4225;"></span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Chat Color</td>
+                                                        <td>
+                                                            <select id="content-ranks-table-rank-chatcolor-color" class="form-select" style="width: 50%;">
+                                                                <option value="">None</option>
+                                                                <option value="&0">&0 Black</option>
+                                                                <option value="&1">&1 Dark Blue</option>
+                                                                <option value="&2">&2 Dark Green</option>
+                                                                <option value="&3">&3 Dark Turquoise</option>
+                                                                <option value="&4">&4 Dark Red</option>
+                                                                <option value="&5">&5 Magenta</option>
+                                                                <option value="&6">&6 Orange</option>
+                                                                <option value="&7">&7 Light Gray</option>
+                                                                <option value="&8">&8 Dark Gray</option>
+                                                                <option value="&9">&9 Light Blue</option>
+                                                                <option value="&a">&a Light Green</option>
+                                                                <option value="&b">&b Light Turquoise</option>
+                                                                <option value="&c">&c Red</option>
+                                                                <option value="&d">&d Pink</option>
+                                                                <option value="&e">&e Yellow</option>
+                                                                <option value="&f">&f White</option>
+                                                            </select>
+                                                            <select id="content-ranks-table-rank-chatcolor-special" class="form-select" style="width: 50%; margin-top: -38px; float: right;">
+                                                                <option value="">None</option>
+                                                                <option value="&l">&l Bold</option>
+                                                                <option value="&m">&m Strike</option>
+                                                                <option value="&n">&n Underline</option>
+                                                                <option value="&o">&o Itallic</option>
+                                                                <option value="&k">&k Magic</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>The color of the chat message</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Name Color</td>
+                                                        <td>
+                                                            <select id="content-ranks-table-rank-namecolor-color" class="form-select" style="width: 50%;">
+                                                                <option value="">None</option>
+                                                                <option value="&0">&0 Black</option>
+                                                                <option value="&1">&1 Dark Blue</option>
+                                                                <option value="&2">&2 Dark Green</option>
+                                                                <option value="&3">&3 Dark Turquoise</option>
+                                                                <option value="&4">&4 Dark Red</option>
+                                                                <option value="&5">&5 Magenta</option>
+                                                                <option value="&6">&6 Orange</option>
+                                                                <option value="&7">&7 Light Gray</option>
+                                                                <option value="&8">&8 Dark Gray</option>
+                                                                <option value="&9">&9 Light Blue</option>
+                                                                <option value="&a">&a Light Green</option>
+                                                                <option value="&b">&b Light Turquoise</option>
+                                                                <option value="&c">&c Red</option>
+                                                                <option value="&d">&d Pink</option>
+                                                                <option value="&e">&e Yellow</option>
+                                                                <option value="&f">&f White</option>
+                                                            </select>
+                                                            <select id="content-ranks-table-rank-namecolor-special" class="form-select" style="width: 50%; margin-top: -38px; float: right;">
+                                                                <option value="">None</option>
+                                                                <option value="&l">&l Bold</option>
+                                                                <option value="&m">&m Strike</option>
+                                                                <option value="&n">&n Underline</option>
+                                                                <option value="&o">&o Itallic</option>
+                                                                <option value="&k">&k Magic</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>The color of the player's name</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Build</td>
+                                                        <td id="content-ranks-table-rank-build" class="checkbox-container"></td>
+                                                        <td>Allow this rank to break & place blocks?</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Inheritances</td>
+                                                        <td></td>
+                                                        <td>From what rank(s) will this rank inherit permissions?</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Promote to</td>
+                                                        <td></td>
+                                                        <td>To what rank should the player promote?</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Demote to</td>
+                                                        <td></td>
+                                                        <td>To what rank should the player demote?</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Economy buyable ranks</td>
+                                                        <td></td>
+                                                        <td>What ranks can be bought?</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Economy rank cost</td>
+                                                        <td></td>
+                                                        <td>What is the cost of this rank?</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>GUI icon</td>
+                                                        <td></td>
+                                                        <td>What item should be the icon of this rank?</td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -470,6 +600,11 @@
                                     <div class="card">
                                         <h1 class="card-title" style="margin-left: 20px;margin-top: 20px;text-align: center;">Permissions</h1>
                                         <div class="card-body">
+                                            <div style="left: 25%;width: 50%;position: relative;">
+                                                <input id="content-ranks-table-permissions-input-add" class="form-control" style="width: 100%;" placeholder="plugin.permission.node" />
+                                                <button id="content-ranks-table-permissions-button-add" class="btn btn-success" style="width: 100%; margin-bottom: 25px;">Add permission</button>
+                                                <br />
+                                            </div>
                                             <table class="table table-bordered">
                                                 <thead>
                                                   <tr>
@@ -477,7 +612,7 @@
                                                     <th scope="col">Options</th>
                                                   </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody id="content-ranks-table-permissions">
                                                 </tbody>
                                             </table>
                                         </div>

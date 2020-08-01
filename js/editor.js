@@ -341,6 +341,63 @@ function show_content(page, item) {
         $("#content-players").hide();
         $("#content-about").hide();
         $("#content-ranks-item").text(item);
+
+        $("#content-ranks-table-rank-button-remove").attr("onclick", "deleteRank('" + item + "');");
+
+        $("#content-ranks-table-rank-name").html("<input type=\"text\" class=\"form-control\" value=\"" + item + "\" onchange=\"renameRank('" + item + "', $(this).val());\" />");
+        $("#content-ranks-table-rank-build").html("<input class=\"checkbox-input checkbox-ranks-build-enable\" type=\"checkbox\" " + (ranks_data.Groups[item].build ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-ranks-build-enable').attr('checked', !$('.checkbox-ranks-build-enable').attr('checked')); ranks_data.Groups['" + item + "'].build = !!$('.checkbox-ranks-build-enable').attr('checked');\"></span>");
+        $("#content-ranks-table-rank-prefix").html("<input type=\"text\" class=\"form-control\" value=\"" + ranks_data.Groups[item].chat.prefix + "\" onchange=\"ranks_data.Groups['" + item + "'].chat.prefix = $(this).val(); $('#content-ranks-table-rank-prefix-preview').html(formatMinecraftColor(ranks_data.Groups['" + item + "'].chat.prefix));\" />");
+        $("#content-ranks-table-rank-suffix").html("<input type=\"text\" class=\"form-control\" value=\"" + ranks_data.Groups[item].chat.suffix + "\" onchange=\"ranks_data.Groups['" + item + "'].chat.suffix = $(this).val(); $('#content-ranks-table-rank-suffix-preview').html(formatMinecraftColor(ranks_data.Groups['" + item + "'].chat.suffix));\" />");
+        $("#content-ranks-table-rank-chatcolor-color").attr("onchange", "if(ranks_data.Groups['" + item + "'].chat.chatColor.match('[0-9a-fA-F]')){if($(this).val().length > 0){ranks_data.Groups['" + item + "'].chat.chatColor = ranks_data.Groups['" + item + "'].chat.chatColor.replaceAt(ranks_data.Groups['" + item + "'].chat.chatColor.match('[0-9a-fA-F]').index-1, $(this).val());}else{ranks_data.Groups['" + item + "'].chat.chatColor = ranks_data.Groups['" + item + "'].chat.chatColor.replaceAt(ranks_data.Groups['" + item + "'].chat.chatColor.match('[0-9a-fA-F]').index-1, '  ').replaceAll('  ', '');}}else{ranks_data.Groups['" + item + "'].chat.chatColor=$(this).val()+ranks_data.Groups['" + item + "'].chat.chatColor;}");
+        $("#content-ranks-table-rank-chatcolor-special").attr("onchange", "if(ranks_data.Groups['" + item + "'].chat.chatColor.match('[LlMmNnOoKk]')){if($(this).val().length > 0){ranks_data.Groups['" + item + "'].chat.chatColor = ranks_data.Groups['" + item + "'].chat.chatColor.replaceAt(ranks_data.Groups['" + item + "'].chat.chatColor.match('[LlMmNnOoKk]').index-1, $(this).val());}else{ranks_data.Groups['" + item + "'].chat.chatColor = ranks_data.Groups['" + item + "'].chat.chatColor.replaceAt(ranks_data.Groups['" + item + "'].chat.chatColor.match('[LlMmNnOoKk]').index-1, '  ').replaceAll('  ', '');}}else{ranks_data.Groups['" + item + "'].chat.chatColor=ranks_data.Groups['" + item + "'].chat.chatColor+$(this).val();}");
+        $("#content-ranks-table-rank-namecolor-color").attr("onchange", "if(ranks_data.Groups['" + item + "'].chat.nameColor.match('[0-9a-fA-F]')){if($(this).val().length > 0){ranks_data.Groups['" + item + "'].chat.nameColor = ranks_data.Groups['" + item + "'].chat.nameColor.replaceAt(ranks_data.Groups['" + item + "'].chat.nameColor.match('[0-9a-fA-F]').index-1, $(this).val());}else{ranks_data.Groups['" + item + "'].chat.nameColor = ranks_data.Groups['" + item + "'].chat.nameColor.replaceAt(ranks_data.Groups['" + item + "'].chat.nameColor.match('[0-9a-fA-F]').index-1, '  ').replaceAll('  ', '');}}else{ranks_data.Groups['" + item + "'].chat.nameColor=$(this).val()+ranks_data.Groups['" + item + "'].chat.nameColor;}");
+        $("#content-ranks-table-rank-namecolor-special").attr("onchange", "if(ranks_data.Groups['" + item + "'].chat.nameColor.match('[LlMmNnOoKk]')){if($(this).val().length > 0){ranks_data.Groups['" + item + "'].chat.nameColor = ranks_data.Groups['" + item + "'].chat.nameColor.replaceAt(ranks_data.Groups['" + item + "'].chat.nameColor.match('[LlMmNnOoKk]').index-1, $(this).val());}else{ranks_data.Groups['" + item + "'].chat.nameColor = ranks_data.Groups['" + item + "'].chat.nameColor.replaceAt(ranks_data.Groups['" + item + "'].chat.nameColor.match('[LlMmNnOoKk]').index-1, '  ').replaceAll('  ', '');}}else{ranks_data.Groups['" + item + "'].chat.nameColor=ranks_data.Groups['" + item + "'].chat.nameColor+$(this).val();}");
+
+        if (ranks_data.Groups[item].chat.chatColor.match('[0-9a-fA-F]')) {
+            $("#content-ranks-table-rank-chatcolor-color").val(ranks_data.Groups[item].chat.chatColor[ranks_data.Groups[item].chat.chatColor.match('[0-9a-fA-F]').index - 1] + ranks_data.Groups[item].chat.chatColor[ranks_data.Groups[item].chat.chatColor.match('[0-9a-fA-F]').index])
+        } else {
+            $("#content-ranks-table-rank-chatcolor-color").val("");
+        }
+
+        if (ranks_data.Groups[item].chat.chatColor.match('[LlMmNnOoKk]')) {
+            $("#content-ranks-table-rank-chatcolor-special").val(ranks_data.Groups[item].chat.chatColor[ranks_data.Groups[item].chat.chatColor.match('[LlMmNnOoKk]').index - 1] + ranks_data.Groups[item].chat.chatColor[ranks_data.Groups[item].chat.chatColor.match('[LlMmNnOoKk]').index])
+        } else {
+            $("#content-ranks-table-rank-chatcolor-special").val("");
+        }
+
+        if (ranks_data.Groups[item].chat.nameColor.match('[0-9a-fA-F]')) {
+            $("#content-ranks-table-rank-namecolor-color").val(ranks_data.Groups[item].chat.nameColor[ranks_data.Groups[item].chat.nameColor.match('[0-9a-fA-F]').index - 1] + ranks_data.Groups[item].chat.nameColor[ranks_data.Groups[item].chat.nameColor.match('[0-9a-fA-F]').index])
+        } else {
+            $("#content-ranks-table-rank-namecolor-color").val("");
+        }
+
+        if (ranks_data.Groups[item].chat.nameColor.match('[LlMmNnOoKk]')) {
+            $("#content-ranks-table-rank-namecolor-special").val(ranks_data.Groups[item].chat.nameColor[ranks_data.Groups[item].chat.nameColor.match('[LlMmNnOoKk]').index - 1] + ranks_data.Groups[item].chat.nameColor[ranks_data.Groups[item].chat.nameColor.match('[LlMmNnOoKk]').index])
+        } else {
+            $("#content-ranks-table-rank-namecolor-special").val("");
+        }
+        
+        $('#content-ranks-table-rank-prefix-preview').html(formatMinecraftColor(ranks_data.Groups[item].chat.prefix));
+        $('#content-ranks-table-rank-suffix-preview').html(formatMinecraftColor(ranks_data.Groups[item].chat.suffix));
+
+        $("#content-ranks-table-permissions-button-add").attr("onclick", "if ($('#content-ranks-table-permissions-input-add').val().length > 0) {if (!ranks_data.Groups['" + item + "'].permissions.includes($('#content-ranks-table-permissions-input-add').val()) && !ranks_data.Groups['" + item + "'].permissions.includes('-' + $('#content-ranks-table-permissions-input-add').val())) {ranks_data.Groups['" + item + "'].permissions.push($('#content-ranks-table-permissions-input-add').val()); $('#content-ranks-table-permissions-input-add').val(''); show_content('ranks', '" + item + "');}$('#content-ranks-table-permissions-input-add').val('');}");
+
+        //$("#content-players-table-permissions-button-add").attr("onclick", "if ($('#content-players-table-permissions-input-add').val().length > 0) {if (!players_data.players['" + item + "'].permissions.includes($('#content-players-table-permissions-input-add').val()) && !players_data.players['" + item + "'].permissions.includes('-' + $('#content-players-table-permissions-input-add').val())) {players_data.players['" + item + "'].permissions.push($('#content-players-table-permissions-input-add').val()); $('#content-players-table-permissions-input-add').val(''); show_content('players', '" + item + "');}$('#content-players-table-permissions-input-add').val('');}");
+
+        var content_ranks_table_permissions = "";
+        for (var i = 0; i < ranks_data.Groups[item].permissions.length; i++) {
+            var permission = ranks_data.Groups[item].permissions[i];
+            content_ranks_table_permissions += "<tr>";
+            content_ranks_table_permissions += "<td>" + permission + "</td>";
+            content_ranks_table_permissions += "<td>";
+            content_ranks_table_permissions += "<button class=\"btn btn-" + (permission[0] === "-" ? "warning" : "success") + "\" onclick=\"toggleRankPermission(this, '" + item + "', '" + permission + "'); show_content('ranks', '" + item + "');\">" + (permission[0] === "-" ? "Disallowed" : "Allowed") + "</button>";
+            content_ranks_table_permissions += "<button class=\"btn btn-danger\" style=\"float: right;\" onclick=\"ranks_data.Groups['" + item + "'].permissions.splice( $.inArray('" + permission + "', ranks_data.Groups['" + item + "'].permissions), 1); show_content('ranks', '" + item + "');\">Remove</button>";
+            content_ranks_table_permissions += "</td>";
+            content_ranks_table_permissions += "</tr>";
+        }
+        $("#content-ranks-table-permissions").html(content_ranks_table_permissions);
+
+        autocomplete(document.getElementById("content-ranks-table-permissions-input-add"), server_data.server_permissions.split(","));
     }
 
     if (page.toLowerCase() === "usertags") {
@@ -813,11 +870,12 @@ function replaceOnPage(search, replacement) {
 }
 
 function formatMinecraftColor(input) {
+    input = "&f" + input;
     var input_split = input.split("&");
-    for (val in input_split) {
+    for (var val in input_split) {
         if (input_split[val].length > 0) {
             var color = input_split[val][0];
-            var text = input_split[val].substring(1);
+            var text = input_split.length > 1 ? input_split[val].substring(1) : input_split[val];
 
             input_split[val] = "<span style=\"" + minecraftColorToCSS(color) + "\">" + text + "</span>";
         }
@@ -924,6 +982,10 @@ String.prototype.toHHMMSS = function () {
     return hours+':'+minutes+':'+seconds;
 }
 
+String.prototype.replaceAt = function(index, replacement) {
+    return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+}
+
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
@@ -1004,4 +1066,35 @@ function togglePlayerPermission(_this, uuid, permission) {
             }
         }
     }
+}
+
+function toggleRankPermission(_this, rank, permission) {
+    var button = $(_this);
+    for (var i = 0; i < ranks_data.Groups[rank].permissions.length; i++) {
+        if (ranks_data.Groups[rank].permissions[i].includes(permission)) {
+            if (ranks_data.Groups[rank].permissions[i][0] === "-") {
+                ranks_data.Groups[rank].permissions[i] = ranks_data.Groups[rank].permissions[i].replace("-", "");
+                button.addClass("btn-success").removeClass("btn-warning");
+                button.text("Allowed");
+            } else {
+                ranks_data.Groups[rank].permissions[i] = "-" + ranks_data.Groups[rank].permissions[i];
+                button.addClass("btn-warning").removeClass("btn-success");
+                button.text("Disllowed");
+            }
+        }
+    }
+}
+
+function renameRank(rank, new_name) {
+    ranks_data.Groups[new_name] = ranks_data.Groups[rank];
+    delete ranks_data.Groups[rank];
+    $("#menu_side_dropdown_ranks").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + new_name + "');' style='cursor: pointer;'\"'>" + new_name + "</a></li>");
+    $('#menu_side_dropdown_ranks').children().remove(":contains('" + rank + "'):first()");
+    show_content('ranks', new_name);
+}
+
+function deleteRank(rank) {
+    delete ranks_data.Groups[rank];
+    $('#menu_side_dropdown_ranks').children().remove(":contains('" + rank + "'):first()");
+    show_content('dashboard', "");
 }
