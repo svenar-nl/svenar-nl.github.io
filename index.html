@@ -122,7 +122,7 @@
                             <form>
                                 <div class="form-group">
                                     <label>Editor ID:</label>
-                                    <input id="noidoverlayinputid" type="text" class="form-control p_input" name="id">
+                                    <input id="noidoverlayinputid" type="text" class="form-control p_input" name="id" placeholder="XXXXXXXXXXXX" />
                                 </div>
                                 <p id="noidoverlayinvalidid" class="card-text" style="color: #F00; display: none;">Oh no! The ID you entered does not work.</p>
                                 <div class="text-center">
@@ -131,12 +131,12 @@
                                     <button id="noidoverlaybtneditorloadcookie" onclick="$('#noidoverlayinputid').val('save');" class="btn btn-success btn-block enter-btn" style="display: none;">Load</button>
                                 </div>
                             </form>
-                            <h4 class="card-text">Edit your PowerRanks configuration files in an easy to use web interface.</h4>
-                            <p class="card-text">To start a new editor session, use the following command: <strong>/pr webeditor</strong> and enter the ID.<br />Or explore the demo to see the editor's features!</p>
-                            <p class="card-text"><small>Requires PowerRanks v1.0 or higher & PowerRanksWebEditor.jar add-on</small></p>
-                            <button class="btn btn-warning" style="width: 100%;" onclick="alert('Download not available yet!');">Download PowerRanksWebEditor.jar</button>
-                            <p>Place PowerRanksWebEditor.jar in the PowerRanks/Addons directory and restart your server.</p>
-                            <p>Then do <code>/pr webeditor</code> to get started</p>
+                            <button class="btn btn-warning" style="width: 100%;" onclick="window.location='downloads/PowerRanksWebEditor.jar';">Download PowerRanksWebEditor.jar (v1.1)</button>
+                            <p class="card-text"><small>Requires PowerRanks v1.0 or higher</small></p>
+                            <h4 class="card-text">Edit your PowerRanks configuration files in an easy-to-use web interface.</h4>
+                            <p>Place <code>PowerRanksWebEditor.jar</code> in the <code>/plugins/PowerRanks/Addons</code> directory and restart your server.</p>
+                            <p class="card-text">Then to start a new editor session, use the following command: <code>/pr webeditor start</code> and enter the ID.<br />Or explore the demo to see the editor's features!</p>
+                            <!-- <p>Then do <code>/pr webeditor</code> to get started</p> -->
                         </div>
                     </div>
                 </div>
@@ -321,6 +321,7 @@
                                         <div class="col-5 col-sm-7 col-xl-8 p-0">
                                         <h4 class="mb-1 mb-sm-0">Welcome to the PowerRanks web editor BETA</h4>
                                         <p class="mb-0 font-weight-normal d-none d-sm-block">Please report any bugs / features in the discord server</p>
+                                        <p class="mb-0 font-weight-normal d-none d-sm-block">This beta does not have a tutorial on how to use it yet!</p>
                                         </div>
                                         <div class="col-3 col-sm-2 col-xl-2 pl-0 text-center">
                                         <span>
@@ -563,32 +564,40 @@
                                                     </tr>
                                                     <tr>
                                                         <td>Inheritances</td>
-                                                        <td></td>
+                                                        <td id="content-ranks-table-rank-inheritances"></td>
                                                         <td>From what rank(s) will this rank inherit permissions?</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Promote to</td>
-                                                        <td></td>
+                                                        <td>
+                                                            <select id="content-ranks-table-rank-promote" class="form-select"></select>
+                                                        </td>
                                                         <td>To what rank should the player promote?</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Demote to</td>
-                                                        <td></td>
+                                                        <td>
+                                                            <select id="content-ranks-table-rank-demote" class="form-select"></select>
+                                                        </td>
                                                         <td>To what rank should the player demote?</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Economy buyable ranks</td>
-                                                        <td></td>
-                                                        <td>What ranks can be bought?</td>
+                                                        <td id="content-ranks-table-rank-economy-buyable"></td>
+                                                        <td>What ranks can be bought? (Vault)</td>
                                                     </tr>
                                                     <tr>
                                                         <td>Economy rank cost</td>
-                                                        <td></td>
-                                                        <td>What is the cost of this rank?</td>
+                                                        <td>
+                                                            <input id="content-ranks-table-rank-economy-cost" type="number" class="form-control" />
+                                                        </td>
+                                                        <td>What is the cost of this rank? (Vault)</td>
                                                     </tr>
                                                     <tr>
                                                         <td>GUI icon</td>
-                                                        <td></td>
+                                                        <td>
+                                                            <select id="content-ranks-table-rank-gui-icon" class="form-select"></select>
+                                                        </td>
                                                         <td>What item should be the icon of this rank?</td>
                                                     </tr>
                                                 </tbody>
@@ -781,6 +790,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
         <script src="js/autocomplete.js"></script>
+        <script src="js/minecraft_items.js"></script>
         <script src="js/editor.js"></script>
     </body>
 </html>

@@ -353,6 +353,75 @@ function show_content(page, item) {
         $("#content-ranks-table-rank-namecolor-color").attr("onchange", "if(ranks_data.Groups['" + item + "'].chat.nameColor.match('[0-9a-fA-F]')){if($(this).val().length > 0){ranks_data.Groups['" + item + "'].chat.nameColor = ranks_data.Groups['" + item + "'].chat.nameColor.replaceAt(ranks_data.Groups['" + item + "'].chat.nameColor.match('[0-9a-fA-F]').index-1, $(this).val());}else{ranks_data.Groups['" + item + "'].chat.nameColor = ranks_data.Groups['" + item + "'].chat.nameColor.replaceAt(ranks_data.Groups['" + item + "'].chat.nameColor.match('[0-9a-fA-F]').index-1, '  ').replaceAll('  ', '');}}else{ranks_data.Groups['" + item + "'].chat.nameColor=$(this).val()+ranks_data.Groups['" + item + "'].chat.nameColor;}");
         $("#content-ranks-table-rank-namecolor-special").attr("onchange", "if(ranks_data.Groups['" + item + "'].chat.nameColor.match('[LlMmNnOoKk]')){if($(this).val().length > 0){ranks_data.Groups['" + item + "'].chat.nameColor = ranks_data.Groups['" + item + "'].chat.nameColor.replaceAt(ranks_data.Groups['" + item + "'].chat.nameColor.match('[LlMmNnOoKk]').index-1, $(this).val());}else{ranks_data.Groups['" + item + "'].chat.nameColor = ranks_data.Groups['" + item + "'].chat.nameColor.replaceAt(ranks_data.Groups['" + item + "'].chat.nameColor.match('[LlMmNnOoKk]').index-1, '  ').replaceAll('  ', '');}}else{ranks_data.Groups['" + item + "'].chat.nameColor=ranks_data.Groups['" + item + "'].chat.nameColor+$(this).val();}");
 
+        var content_ranks_table_rank_inheritances = "";
+        content_ranks_table_rank_inheritances += "<select id=\"content-ranks-table-rank-" + item + "-inheritance-select\" class=\"form-select\">";
+        for (var rank in ranks_data.Groups) {
+            if (rank !== item && !ranks_data.Groups[item].inheritance.includes(rank)) {
+                content_ranks_table_rank_inheritances += "<option value=\"" + rank + "\">" + rank + "</option>";
+            }
+        }
+        content_ranks_table_rank_inheritances += "</select>";
+        content_ranks_table_rank_inheritances += "<button class=\"btn btn-success\" onclick=\"addRankInheritance('content-ranks-table-rank-" + item + "-inheritance-select', '" + item + "');\" style=\"width: 100%; margin-bottom: 25px;\">Add Inheritance</button>";
+        content_ranks_table_rank_inheritances += "<div>";
+        for (var key in ranks_data.Groups[item].inheritance) {
+            var inheritance_rank = ranks_data.Groups[item].inheritance[key];
+            content_ranks_table_rank_inheritances += "<p style=\"border-bottom: 1px solid #2c2e33;margin-bottom: 25px;\">" + inheritance_rank;
+            content_ranks_table_rank_inheritances += "<button class=\"btn btn-danger\" style=\"float: right;margin-top: -15px;\" onclick=\"ranks_data.Groups['" + item + "'].inheritance.splice( $.inArray('" + inheritance_rank + "', ranks_data.Groups['" + item + "'].inheritance), 1); show_content('ranks', '" + item + "');\">Remove</button>";
+            content_ranks_table_rank_inheritances += "</p>";
+        }
+        content_ranks_table_rank_inheritances += "</div>";
+        $("#content-ranks-table-rank-inheritances").html(content_ranks_table_rank_inheritances);
+
+        var content_ranks_table_rank_buyable = "";
+        content_ranks_table_rank_buyable += "<select id=\"content-ranks-table-rank-" + item + "-economy-buyable-select\" class=\"form-select\">";
+        for (var rank in ranks_data.Groups) {
+            if (rank !== item && !ranks_data.Groups[item].economy.buyable.includes(rank)) {
+                content_ranks_table_rank_buyable += "<option value=\"" + rank + "\">" + rank + "</option>";
+            }
+        }
+        content_ranks_table_rank_buyable += "</select>";
+        content_ranks_table_rank_buyable += "<button class=\"btn btn-success\" onclick=\"addRankEconomyBuyable('content-ranks-table-rank-" + item + "-economy-buyable-select', '" + item + "');\" style=\"width: 100%; margin-bottom: 25px;\">Add Inheritance</button>";
+        content_ranks_table_rank_buyable += "<div>";
+        for (var key in ranks_data.Groups[item].economy.buyable) {
+            var buyable_rank = ranks_data.Groups[item].economy.buyable[key];
+            content_ranks_table_rank_buyable += "<p style=\"border-bottom: 1px solid #2c2e33;margin-bottom: 25px;\">" + buyable_rank;
+            content_ranks_table_rank_buyable += "<button class=\"btn btn-danger\" style=\"float: right;margin-top: -15px;\" onclick=\"ranks_data.Groups['" + item + "'].economy.buyable.splice( $.inArray('" + buyable_rank + "', ranks_data.Groups['" + item + "'].economy.buyable), 1); show_content('ranks', '" + item + "');\">Remove</button>";
+            content_ranks_table_rank_buyable += "</p>";
+        }
+        content_ranks_table_rank_buyable += "</div>";
+        $("#content-ranks-table-rank-economy-buyable").html(content_ranks_table_rank_buyable);
+
+        var content_ranks_table_rank_promote = "";
+        var content_ranks_table_rank_demote = "";
+
+        content_ranks_table_rank_promote += "<option value=\"\">None</option>";
+        content_ranks_table_rank_demote += "<option value=\"\">None</option>";
+        for (var rank in ranks_data.Groups) {
+            if (rank !== item) {
+                content_ranks_table_rank_promote += "<option value=\"" + rank + "\" " + (rank === ranks_data.Groups[item].level.promote ? "selected" : "") + ">" + rank + "</option>";
+                content_ranks_table_rank_demote += "<option value=\"" + rank + "\" " + (rank === ranks_data.Groups[item].level.demote ? "selected" : "") + ">" + rank + "</option>";
+            }
+        }
+        $("#content-ranks-table-rank-promote").attr("onchange", "if ($(this).val().length>0){ranks_data.Groups['" + item + "'].level.promote=$(this).val();}else{ranks_data.Groups['" + item + "'].level.promote='';}show_content('ranks', '" + item + "');");
+        $("#content-ranks-table-rank-demote").attr("onchange", "if ($(this).val().length>0){ranks_data.Groups['" + item + "'].level.demote=$(this).val();}else{ranks_data.Groups['" + item + "'].level.demote='';}show_content('ranks', '" + item + "');");
+        $("#content-ranks-table-rank-promote").html(content_ranks_table_rank_promote);
+        $("#content-ranks-table-rank-demote").html(content_ranks_table_rank_demote);
+
+        $("#content-ranks-table-rank-economy-cost").attr("onchange", "ranks_data.Groups['" + item + "'].economy.cost=$(this).val();show_content('ranks', '" + item + "');");
+        $("#content-ranks-table-rank-economy-cost").val(parseInt(ranks_data.Groups[item].economy.cost));
+
+        var content_ranks_table_rank_gui_icon = "";
+        for (var i = 0; i < minecraft_items.length; i++) {
+            var mcitem = minecraft_items[i].toLowerCase();
+            // if (mcitem !== item) {
+                content_ranks_table_rank_gui_icon += "<option value=\"" + mcitem + "\" " + (mcitem === ranks_data.Groups[item].gui.icon.toLowerCase() ? "selected" : "") + ">" + mcitem + "</option>";
+            // }
+        }
+        $("#content-ranks-table-rank-gui-icon").html(content_ranks_table_rank_gui_icon);
+        $("#content-ranks-table-rank-gui-icon").attr("onchange", "ranks_data.Groups['" + item + "'].gui.icon=$(this).val();show_content('ranks', '" + item + "');");
+
+        // ///////////
+
         if (ranks_data.Groups[item].chat.chatColor.match('[0-9a-fA-F]')) {
             $("#content-ranks-table-rank-chatcolor-color").val(ranks_data.Groups[item].chat.chatColor[ranks_data.Groups[item].chat.chatColor.match('[0-9a-fA-F]').index - 1] + ranks_data.Groups[item].chat.chatColor[ranks_data.Groups[item].chat.chatColor.match('[0-9a-fA-F]').index])
         } else {
@@ -712,12 +781,6 @@ function updateConfigContentBody(config_item) {
 }
 
 function updatePlayerContentGamePreview(player_uuid) {
-    // $("#content-players-output-chat").html("<span style=\"color: aqua;\">[" + players_data.players[item].rank + "] </span>" + "<span style=\"color: gold;\">" + players_data.players[item].name + "</span>" + "<span style=\"color: white;\">: </span>" + "<span style=\"color: red;\">Hello!</span>");
-
-    // $("#content-players-output-tablist").html("<img src=\"https://crafatar.com/avatars/" + item + "?size=96&default=MHF_Steve\" alt=\"[plrhead]\" style=\"width: 24px;margin-right: 5px;margin-top: -5px;\">" + 
-    // "<span style=\"color: aqua;\">[" + players_data.players[item].rank + "] </span>" + "<span style=\"color: gold;\">" + players_data.players[item].name + "</span>" + 
-    // "<img src=\"assets/images/ConnectionBars.png\" alt=\"[conn]\" style=\"width: 24px;margin-right: 5px;margin-top: -5px;\">");
-
     var chat_content = "";
     var tab_content = "";
 
@@ -725,6 +788,28 @@ function updatePlayerContentGamePreview(player_uuid) {
     var tab_format = config_data.tablist_modification.format;
 
     var random_world = server_data.server_worlds.split(",")[Math.round(Math.random() * (server_data.server_worlds.split(",").length - 1))];
+
+    var subprefix_output = "";
+    var subsuffix_output = "";
+
+    for (var subrank in players_data.players[player_uuid].subranks) {
+        if (players_data.players[player_uuid].subranks[subrank].use_prefix) {
+            if (ranks_data.Groups[subrank] !== undefined) {
+                subprefix_output += ranks_data.Groups[subrank].chat.prefix + " ";
+            }
+        }
+    }
+
+    for (var subrank in players_data.players[player_uuid].subranks) {
+        if (players_data.players[player_uuid].subranks[subrank].use_suffix) {
+            if (ranks_data.Groups[subrank] !== undefined) {
+                subsuffix_output += ranks_data.Groups[subrank].chat.suffix + " ";
+            }
+        }
+    }
+
+    subprefix_output = subprefix_output.substring(0, subprefix_output.length - 1);
+    subsuffix_output = subsuffix_output.substring(0, subsuffix_output.length - 1);
 
     chat_format = chat_format.replace("[world]", random_world);
     tab_format = tab_format.replace("[world]", random_world);
@@ -735,11 +820,11 @@ function updatePlayerContentGamePreview(player_uuid) {
     chat_format = chat_format.replace("[prefix]", "&r" + (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.prefix : ""));
     tab_format = tab_format.replace("[prefix]", "&r" + (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.prefix : ""));
 
-    chat_format = chat_format.replace("[subprefix]", "&r" + ""); // TODO
-    tab_format = tab_format.replace("[subprefix]", "&r" + ""); // TODO
+    chat_format = chat_format.replace("[subprefix]", "&r" + subprefix_output);
+    tab_format = tab_format.replace("[subprefix]", "&r" + subprefix_output);
 
-    chat_format = chat_format.replace("[subsuffix]", "&r" + ""); // TODO
-    tab_format = tab_format.replace("[subsuffix]", "&r" + ""); // TODO
+    chat_format = chat_format.replace("[subsuffix]", "&r" + subsuffix_output);
+    tab_format = tab_format.replace("[subsuffix]", "&r" + subsuffix_output);
 
     chat_format = chat_format.replace("[player]", (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.nameColor : "") + players_data.players[player_uuid].name);
     tab_format = tab_format.replace("[player]", (players_data.players[player_uuid].rank.length > 0 && ranks_data.Groups[players_data.players[player_uuid].rank] !== undefined ? ranks_data.Groups[players_data.players[player_uuid].rank].chat.nameColor : "") + players_data.players[player_uuid].name);
@@ -1097,4 +1182,48 @@ function deleteRank(rank) {
     delete ranks_data.Groups[rank];
     $('#menu_side_dropdown_ranks').children().remove(":contains('" + rank + "'):first()");
     show_content('dashboard', "");
+}
+
+function addRankInheritance(select_id, rank) {
+    var contains_rank = false;
+    var select = $("#" + select_id);
+    if (select.val().length === 0) {
+        return;
+    }
+
+    for (var r in ranks_data.Groups[rank]) {
+        if (select.val() === r) {
+            contains_rank = true;
+            break;
+        }
+    }
+
+    if (!contains_rank) {
+        ranks_data.Groups[rank].inheritance.push(select.val());
+        show_content("ranks", rank);
+    } else {
+        return;
+    }
+}
+
+function addRankEconomyBuyable(select_id, rank) {
+    var contains_rank = false;
+    var select = $("#" + select_id);
+    if (select.val().length === 0) {
+        return;
+    }
+
+    for (var r in ranks_data.Groups[rank]) {
+        if (select.val() === r) {
+            contains_rank = true;
+            break;
+        }
+    }
+
+    if (!contains_rank) {
+        ranks_data.Groups[rank].economy.buyable.push(select.val());
+        show_content("ranks", rank);
+    } else {
+        return;
+    }
 }
