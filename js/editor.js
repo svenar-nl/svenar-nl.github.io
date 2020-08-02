@@ -10,6 +10,10 @@ var ranks_data = undefined;
 var players_data = undefined;
 
 $(document).ready(function() {
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+        $("#mobileDetected").show();
+    }
+
     $("#noidoverlayinputid").on("input", function() {
         if ($("#noidoverlayinputid").val().length === 0) {
             $("#noidoverlaybtneditorsubmit").hide();
@@ -20,11 +24,14 @@ $(document).ready(function() {
         }
     });
 
-    // if (getCookie("save_data_size").length > 0) {
-    //     $("#noidoverlaybtneditorloadcookie").show();
-    // } else {
-    //     $("#noidoverlaybtneditorloadcookie").hide();
-    // }
+    // Privacy policy
+
+    var seen_privacy_policy_notice = getCookie("seen_privacy_policy_notice").length > 0;
+    if (!seen_privacy_policy_notice) {
+        $("#popup-privacy-policy").fadeIn();
+    }
+
+    // Privacy policy
 
     if (getFromLocalStorage("save_data_size") !== null) {
         if (getFromLocalStorage("save_data_size").length > 0) {
@@ -1226,4 +1233,9 @@ function addRankEconomyBuyable(select_id, rank) {
     } else {
         return;
     }
+}
+
+function closePrivacyPolicy() {
+    $("#popup-privacy-policy").fadeOut();
+    setCookie("seen_privacy_policy_notice", "1", 365);
 }
