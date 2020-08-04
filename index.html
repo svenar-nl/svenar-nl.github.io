@@ -32,7 +32,7 @@
     <body>
         <div id="popups">
             <div id="popup-exit" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
-                <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+                <div onclick="$(this).parent().fadeOut();" style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
                 <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
                     <h1>Exit?</h1>
                     <p>Any unsaved progress will be lost.</p>
@@ -43,10 +43,11 @@
                 </div>
             </div>
             <div id="popup-save" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
-                <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+                <div onclick="$(this).parent().fadeOut();" style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
                 <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
                     <h1>Save?</h1>
                     <p>This will overwrite your current save.</p>
+                    <p>When saved you can edit this later without re-initializing the webeditor from within your game, a geen button called 'load' will appear on the Editor ID select screen.</p>
                     <div class="btn-group">
                         <button class="btn btn-primary" onclick="saveDataCookie();">Save</button>
                         <button class="btn btn-secondary" onclick="$('#popup-save').fadeOut();">Cancel</button>
@@ -54,16 +55,17 @@
                 </div>
             </div>
             <div id="popup-save-done" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
-                <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+                <div onclick="$(this).parent().fadeOut();" style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
                 <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
                     <h1>Done saving!</h1>
+                    <p>You can now exit this page without losing data and come back later.</p>
                     <div class="btn-group">
                         <button class="btn btn-primary" onclick="$('#popup-save-done').fadeOut();">Close</button>
                     </div>
                 </div>
             </div>
             <div id="popup-exporting" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
-                <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+                <div onclick="$(this).parent().fadeOut();" style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
                 <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
                     <h1>Exporting...</h1>
                 </div>
@@ -80,7 +82,7 @@
                 </div>
             </div>
             <div id="popup-create-new-rank" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
-                <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+                <div onclick="$(this).parent().fadeOut();" style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
                 <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
                     <h1>Create new rank</h1>
                     <p>Rank name:</p>
@@ -94,7 +96,7 @@
                 </div>
             </div>
             <div id="popup-create-new-usertag" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
-                <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
+                <div onclick="$(this).parent().fadeOut();" style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
                 <div style="position: fixed;width: 100%;height: auto;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;">
                     <h1>Create new Usertag</h1>
                     <p>Usertag name:</p>
@@ -361,7 +363,7 @@
                         <i class="menu-arrow"></i>
                         </a>
                         <div class="collapse" id="ui-players">
-                            <ul class="nav flex-column sub-menu">
+                            <ul id="menu_side_dropdown_players" class="nav flex-column sub-menu">
                                 {{menu_dropdown_players}}
                             </ul>
                         </div>
@@ -763,6 +765,10 @@
                               <div class="card">
                                 <h1 id="content-players-playername" class="card-title" style="margin-left: 20px;margin-top: 20px;text-align: center;">-</h1>
                                 <div class="card-body">
+                                    <div style="left: 25%;width: 50%;position: relative;">
+                                        <button id="content-players-table-player-button-remove" class="btn btn-danger" style="width: 100%; margin-bottom: 25px;">Delete Player</button>
+                                        <br />
+                                    </div>
                                     <table class="table table-bordered">
                                         <thead>
                                           <tr>

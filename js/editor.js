@@ -489,7 +489,7 @@ function show_content(page, item) {
         content += "<div class=\"card\">";
         content += "<h1 class=\"card-title\" style=\"margin-left: 20px;margin-top: 20px;text-align: center;\">" + item + "</h1>";
         content += "<div class=\"card-body\">";
-        content += "<button class=\"btn btn-danger\" onclick=\"delete ranks_data.Usertags['" + item + "']; $('#menu_side_dropdown_usertags').children().remove(':contains(" + item + ")'); show_content('dashboard', '');\" style=\"left: 40%;width: 20%;position: absolute;\">Delete</button>";
+        content += "<button class=\"btn btn-danger\" onclick=\"delete ranks_data.Usertags['" + item + "']; $('#menu_side_dropdown_usertags').children().remove(':contains(" + item + "):first()'); show_content('dashboard', '');\" style=\"left: 40%;width: 20%;position: absolute;\">Delete</button>";
         content += "<table class=\"table table-bordered\" style=\"margin-top: 45px;\"><thead><tr><th scope=\"col\">Key</th><th scope=\"col\">Value</th><th scope=\"col\">Description</th></tr></thead><tbody>";
         content += "<tr><td>Format</td><td>";
         content += "<input class=\"form-control\" type=\"text\" value=\"" + ranks_data.Usertags[item] + "\" onchange=\"ranks_data.Usertags['" + item + "'] = this.value; $('.usertag-format-preview').html(formatMinecraftColor(ranks_data.Usertags['" + item + "']));\" style=\"width: 100%;\">";
@@ -513,6 +513,7 @@ function show_content(page, item) {
         $("#content-about").hide();
 
         $("#content-players-playername").html("<img src=\"https://crafatar.com/avatars/" + item + "?size=36&amp;default=MHF_Steve\" alt=\"[plrhead]\" style=\"width: 36px;margin-right: 5px;margin-top: -10px;\">" + players_data.players[item].name);
+        $("#content-players-table-player-button-remove").attr("onclick", "$('#menu_side_dropdown_players').children().remove(':contains(" + players_data.players[item].name + "):first()'); delete players_data.players['" + item + "']; show_content('dashboard', '');");
 
         updatePlayerContentGamePreview(item);
 
@@ -613,7 +614,7 @@ function show_content(page, item) {
 
         var select_content_player_subranks_add = "";
         for (var rank in ranks_data.Groups) {
-            if (typeof(players_data.players[item].subranks) === "string") {
+            if (players_data.players[item].subranks === undefined || typeof(players_data.players[item].subranks) === "string") {
                 players_data.players[item].subranks = {};
             }
             if (!(rank in players_data.players[item].subranks) && rank !== players_data.players[item].rank) {
@@ -628,24 +629,23 @@ function show_content(page, item) {
         $("#content-players-table-permissions-button-add").attr("onclick", "if ($('#content-players-table-permissions-input-add').val().length > 0) {if (!players_data.players['" + item + "'].permissions.includes($('#content-players-table-permissions-input-add').val()) && !players_data.players['" + item + "'].permissions.includes('-' + $('#content-players-table-permissions-input-add').val())) {players_data.players['" + item + "'].permissions.push($('#content-players-table-permissions-input-add').val()); $('#content-players-table-permissions-input-add').val(''); show_content('players', '" + item + "');}$('#content-players-table-permissions-input-add').val('');}");
 
         var content_players_table_permissions = "";
+        if (players_data.players[item].permissions === undefined || typeof(players_data.players[item].permissions) === "string") {
+            players_data.players[item].permissions = {};
+        }
+        if (players_data.players[item].permissions) {
+            for (var i = 0; i < players_data.players[item].permissions.length; i++) {
+                var permission = players_data.players[item].permissions[i];
 
-        for (var i = 0; i < players_data.players[item].permissions.length; i++) {
-            var permission = players_data.players[item].permissions[i];
-
-            content_players_table_permissions += "<tr>";
-            content_players_table_permissions += "<td>" + permission + "</td>";
-            content_players_table_permissions += "<td>";
-            content_players_table_permissions += "<button class=\"btn btn-" + (permission[0] === "-" ? "warning" : "success") + "\" onclick=\"togglePlayerPermission(this, '" + item + "', '" + permission + "'); show_content('players', '" + item + "');\">" + (permission[0] === "-" ? "Disallowed" : "Allowed") + "</button>";
-            content_players_table_permissions += "<button class=\"btn btn-danger\" style=\"float: right;\" onclick=\"players_data.players['" + item + "'].permissions.splice( $.inArray('" + permission + "', players_data.players['" + item + "'].permissions), 1); show_content('players', '" + item + "');\">Remove</button>";
-            content_players_table_permissions += "</td>";
-            content_players_table_permissions += "</tr>";
+                content_players_table_permissions += "<tr>";
+                content_players_table_permissions += "<td>" + permission + "</td>";
+                content_players_table_permissions += "<td>";
+                content_players_table_permissions += "<button class=\"btn btn-" + (permission[0] === "-" ? "warning" : "success") + "\" onclick=\"togglePlayerPermission(this, '" + item + "', '" + permission + "'); show_content('players', '" + item + "');\">" + (permission[0] === "-" ? "Disallowed" : "Allowed") + "</button>";
+                content_players_table_permissions += "<button class=\"btn btn-danger\" style=\"float: right;\" onclick=\"players_data.players['" + item + "'].permissions.splice( $.inArray('" + permission + "', players_data.players['" + item + "'].permissions), 1); show_content('players', '" + item + "');\">Remove</button>";
+                content_players_table_permissions += "</td>";
+                content_players_table_permissions += "</tr>";
+            }
         }
 
-        //<td>
-    // <button class="btn btn-warning" onclick="$(this).toggle('btn-success').toggle('btn-warning')" style="/* display: none; */">Allowed</button>
-
-    // 
-    // </td>
         $("#content-players-table-permissions").html(content_players_table_permissions);
 
         autocomplete(document.getElementById("content-players-table-permissions-input-add"), server_data.server_permissions.split(","));
