@@ -1180,7 +1180,7 @@ function toggleRankPermission(_this, rank, permission) {
 function renameRank(rank, new_name) {
     ranks_data.Groups[new_name] = ranks_data.Groups[rank];
     delete ranks_data.Groups[rank];
-    $("#menu_side_dropdown_ranks").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + new_name + "');' style='cursor: pointer;'\"'>" + new_name + "</a></li>");
+    $("#menu_side_dropdown_ranks").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + new_name + "');\" style='cursor: pointer;'>" + new_name + "</a></li>");
     $('#menu_side_dropdown_ranks').children().remove(":contains('" + rank + "'):first()");
     show_content('ranks', new_name);
 }
