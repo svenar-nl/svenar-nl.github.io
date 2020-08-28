@@ -373,7 +373,7 @@ function show_content(page, item) {
         for (var key in ranks_data.Groups[item].inheritance) {
             var inheritance_rank = ranks_data.Groups[item].inheritance[key];
             content_ranks_table_rank_inheritances += "<p style=\"border-bottom: 1px solid #2c2e33;margin-bottom: 25px;\">" + inheritance_rank;
-            content_ranks_table_rank_inheritances += "<button class=\"btn btn-danger\" style=\"float: right;margin-top: -15px;\" onclick=\"ranks_data.Groups['" + item + "'].inheritance.splice( $.inArray('" + inheritance_rank + "', ranks_data.Groups['" + item + "'].inheritance), 1); show_content('ranks', '" + item + "');\">Remove</button>";
+            content_ranks_table_rank_inheritances += "<button class=\"btn btn-danger\" style=\"float: right;margin-top: -15px;\" onclick=\"ranks_data.Groups['" + item + "'].inheritance.splice( $.inArray('" + inheritance_rank + "', ranks_data.Groups['" + item + "'].inheritance), 1); show_content('ranks', '" + item + "');\">X</button>";
             content_ranks_table_rank_inheritances += "</p>";
         }
         content_ranks_table_rank_inheritances += "</div>";
@@ -392,7 +392,7 @@ function show_content(page, item) {
         for (var key in ranks_data.Groups[item].economy.buyable) {
             var buyable_rank = ranks_data.Groups[item].economy.buyable[key];
             content_ranks_table_rank_buyable += "<p style=\"border-bottom: 1px solid #2c2e33;margin-bottom: 25px;\">" + buyable_rank;
-            content_ranks_table_rank_buyable += "<button class=\"btn btn-danger\" style=\"float: right;margin-top: -15px;\" onclick=\"ranks_data.Groups['" + item + "'].economy.buyable.splice( $.inArray('" + buyable_rank + "', ranks_data.Groups['" + item + "'].economy.buyable), 1); show_content('ranks', '" + item + "');\">Remove</button>";
+            content_ranks_table_rank_buyable += "<button class=\"btn btn-danger\" style=\"float: right;margin-top: -15px;\" onclick=\"ranks_data.Groups['" + item + "'].economy.buyable.splice( $.inArray('" + buyable_rank + "', ranks_data.Groups['" + item + "'].economy.buyable), 1); show_content('ranks', '" + item + "');\">X</button>";
             content_ranks_table_rank_buyable += "</p>";
         }
         content_ranks_table_rank_buyable += "</div>";
@@ -467,7 +467,7 @@ function show_content(page, item) {
             content_ranks_table_permissions += "<td>" + permission + "</td>";
             content_ranks_table_permissions += "<td>";
             content_ranks_table_permissions += "<button class=\"btn btn-" + (permission[0] === "-" ? "warning" : "success") + "\" onclick=\"toggleRankPermission(this, '" + item + "', '" + permission + "'); show_content('ranks', '" + item + "');\">" + (permission[0] === "-" ? "Disallowed" : "Allowed") + "</button>";
-            content_ranks_table_permissions += "<button class=\"btn btn-danger\" style=\"float: right;\" onclick=\"ranks_data.Groups['" + item + "'].permissions.splice( $.inArray('" + permission + "', ranks_data.Groups['" + item + "'].permissions), 1); show_content('ranks', '" + item + "');\">Remove</button>";
+            content_ranks_table_permissions += "<button class=\"btn btn-danger\" style=\"float: right;\" onclick=\"ranks_data.Groups['" + item + "'].permissions.splice( $.inArray('" + permission + "', ranks_data.Groups['" + item + "'].permissions), 1); show_content('ranks', '" + item + "');\">X</button>";
             content_ranks_table_permissions += "</td>";
             content_ranks_table_permissions += "</tr>";
         }
@@ -595,7 +595,7 @@ function show_content(page, item) {
                     table_content_subranks += "<p style=\"border-bottom: 1px solid #2c2e33;margin-bottom: 25px;\">";
                     table_content_subranks += world;
                     if (world.toLowerCase() !== "all") {
-                        table_content_subranks += "<button class=\"btn btn-danger\" style=\"float: right;margin-top: -15px;\" onclick=\"players_data.players['" + item + "'].subranks['" + key + "'].worlds.splice( $.inArray('" + world + "', players_data.players['" + item + "'].subranks['" + key + "'].worlds), 1); show_content('players', '" + item + "');\">Remove</button>";
+                        table_content_subranks += "<button class=\"btn btn-danger\" style=\"float: right;margin-top: -15px;\" onclick=\"players_data.players['" + item + "'].subranks['" + key + "'].worlds.splice( $.inArray('" + world + "', players_data.players['" + item + "'].subranks['" + key + "'].worlds), 1); show_content('players', '" + item + "');\">X</button>";
                     }
                     table_content_subranks += "</p>";
                 }
@@ -640,7 +640,7 @@ function show_content(page, item) {
                 content_players_table_permissions += "<td>" + permission + "</td>";
                 content_players_table_permissions += "<td>";
                 content_players_table_permissions += "<button class=\"btn btn-" + (permission[0] === "-" ? "warning" : "success") + "\" onclick=\"togglePlayerPermission(this, '" + item + "', '" + permission + "'); show_content('players', '" + item + "');\">" + (permission[0] === "-" ? "Disallowed" : "Allowed") + "</button>";
-                content_players_table_permissions += "<button class=\"btn btn-danger\" style=\"float: right;\" onclick=\"players_data.players['" + item + "'].permissions.splice( $.inArray('" + permission + "', players_data.players['" + item + "'].permissions), 1); show_content('players', '" + item + "');\">Remove</button>";
+                content_players_table_permissions += "<button class=\"btn btn-danger\" style=\"float: right;\" onclick=\"players_data.players['" + item + "'].permissions.splice( $.inArray('" + permission + "', players_data.players['" + item + "'].permissions), 1); show_content('players', '" + item + "');\">X</button>";
                 content_players_table_permissions += "</td>";
                 content_players_table_permissions += "</tr>";
             }
