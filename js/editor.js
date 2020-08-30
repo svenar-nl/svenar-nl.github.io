@@ -58,8 +58,6 @@ $(document).ready(function() {
 
         if (parseURLParams(window.location.href).id[0].toLowerCase() === "save") {
             loadDataCookie();
-            // request_url = "demo.txt";
-            // $("#editorexportdatabutton").hide();
         } else {
             setTimeout(function(){
                 $.ajax({
@@ -111,16 +109,24 @@ function setup_editor() {
     config_data = JSON.parse(tmp_raw_data_split[1]);
     ranks_data = JSON.parse(tmp_raw_data_split[2]);
     players_data = JSON.parse(tmp_raw_data_split[3]);
+
+    for (rank in ranks_data.Groups) {
+        ranks_data.Groups[rank.replaceAll("\\+", "prplus")] = ranks_data.Groups[rank];
+        
+        if (rank.includes("+")) {
+            delete ranks_data.Groups[rank];
+        }
+    }
     
     replace_menu_dropdown_items(config_data, ranks_data, players_data);
     replace_dashboard_info(server_data, config_data, ranks_data, players_data);
     show_content("dashboard", "");
 
-    console.log(tmp_raw_data_split);
-    console.log(server_data);
-    console.log(config_data);
-    console.log(ranks_data);
-    console.log(players_data);
+    // console.log(tmp_raw_data_split);
+    // console.log(server_data);
+    // console.log(config_data);
+    // console.log(ranks_data);
+    // console.log(players_data);
 
     var data = {
         datasets: [{
@@ -152,7 +158,7 @@ function replace_menu_dropdown_items(config_data, ranks_data, players_data) {
     }
 
     for (var item in ranks_data.Groups) {
-        ranks_dropdown_items += "<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + item + "');\" style=\"cursor: pointer;\">" + item + "</a></li>";
+        ranks_dropdown_items += "<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + item.replaceAll("\\+", "prplus") + "');\" style=\"cursor: pointer;\">" + item.replaceAll("prplus", "+") + "</a></li>";
     }
 
     if (typeof(ranks_data.Usertags) !== "string") {
@@ -347,11 +353,11 @@ function show_content(page, item) {
         $("#content-usertags").hide();
         $("#content-players").hide();
         $("#content-about").hide();
-        $("#content-ranks-item").text(item);
+        $("#content-ranks-item").text(item.replaceAll("prplus", "+"));
 
         $("#content-ranks-table-rank-button-remove").attr("onclick", "deleteRank('" + item + "');");
 
-        $("#content-ranks-table-rank-name").html("<input type=\"text\" class=\"form-control\" value=\"" + item + "\" onchange=\"renameRank('" + item + "', $(this).val());\" />");
+        $("#content-ranks-table-rank-name").html("<input type=\"text\" class=\"form-control\" value=\"" + item.replaceAll("prplus", "+") + "\" onchange=\"renameRank('" + item + "', $(this).val());\" />");
         $("#content-ranks-table-rank-build").html("<input class=\"checkbox-input checkbox-ranks-build-enable\" type=\"checkbox\" " + (ranks_data.Groups[item].build ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-ranks-build-enable').attr('checked', !$('.checkbox-ranks-build-enable').attr('checked')); ranks_data.Groups['" + item + "'].build = !!$('.checkbox-ranks-build-enable').attr('checked');\"></span>");
         $("#content-ranks-table-rank-prefix").html("<input type=\"text\" class=\"form-control\" value=\"" + ranks_data.Groups[item].chat.prefix + "\" onchange=\"ranks_data.Groups['" + item + "'].chat.prefix = $(this).val(); $('#content-ranks-table-rank-prefix-preview').html(formatMinecraftColor(ranks_data.Groups['" + item + "'].chat.prefix));\" />");
         $("#content-ranks-table-rank-suffix").html("<input type=\"text\" class=\"form-control\" value=\"" + ranks_data.Groups[item].chat.suffix + "\" onchange=\"ranks_data.Groups['" + item + "'].chat.suffix = $(this).val(); $('#content-ranks-table-rank-suffix-preview').html(formatMinecraftColor(ranks_data.Groups['" + item + "'].chat.suffix));\" />");
@@ -364,7 +370,7 @@ function show_content(page, item) {
         content_ranks_table_rank_inheritances += "<select id=\"content-ranks-table-rank-" + item + "-inheritance-select\" class=\"form-select\">";
         for (var rank in ranks_data.Groups) {
             if (rank !== item && !ranks_data.Groups[item].inheritance.includes(rank)) {
-                content_ranks_table_rank_inheritances += "<option value=\"" + rank + "\">" + rank + "</option>";
+                content_ranks_table_rank_inheritances += "<option value=\"" + rank + "\">" + rank.replaceAll("prplus", "+") + "</option>";
             }
         }
         content_ranks_table_rank_inheritances += "</select>";
@@ -372,7 +378,7 @@ function show_content(page, item) {
         content_ranks_table_rank_inheritances += "<div>";
         for (var key in ranks_data.Groups[item].inheritance) {
             var inheritance_rank = ranks_data.Groups[item].inheritance[key];
-            content_ranks_table_rank_inheritances += "<p style=\"border-bottom: 1px solid #2c2e33;margin-bottom: 25px;\">" + inheritance_rank;
+            content_ranks_table_rank_inheritances += "<p style=\"border-bottom: 1px solid #2c2e33;margin-bottom: 25px;\">" + inheritance_rank.replaceAll("prplus", "+");
             content_ranks_table_rank_inheritances += "<button class=\"btn btn-danger\" style=\"float: right;margin-top: -15px;\" onclick=\"ranks_data.Groups['" + item + "'].inheritance.splice( $.inArray('" + inheritance_rank + "', ranks_data.Groups['" + item + "'].inheritance), 1); show_content('ranks', '" + item + "');\">X</button>";
             content_ranks_table_rank_inheritances += "</p>";
         }
@@ -903,7 +909,23 @@ function loadDataCookie() {
 
 function exportData() {
     console.log("Exporting...");
+    for (rank in ranks_data.Groups) {
+        ranks_data.Groups[rank.replaceAll("prplus", "+")] = ranks_data.Groups[rank];
+
+        if (rank.includes("prplus")) {
+            delete ranks_data.Groups[rank];
+        }
+    }
+
     var raw_data = "POWERRANKS@" + btoa(JSON.stringify(server_data) + "\n" + JSON.stringify(config_data) + "\n" + JSON.stringify(ranks_data) + "\n" + JSON.stringify(players_data));
+
+    for (rank in ranks_data.Groups) {
+        ranks_data.Groups[rank.replaceAll("\\+", "prplus")] = ranks_data.Groups[rank];
+        
+        if (rank.includes("+")) {
+            delete ranks_data.Groups[rank];
+        }
+    }
 
     const API_ENDPOINT = file_base_url;
     const request = new XMLHttpRequest();
@@ -1130,9 +1152,9 @@ function calculatePowerRanksVersionFromString(input) {
 
 function createEmptyRank(name) {
     if (name.length == 0) return;
-    ranks_data.Groups[name] = {permissions: [], inheritance: [], build: true, chat: {prefix: "&r[&7" + name + "&r]", suffix: "", chatColor: "&f", nameColor: "&f"}, level: {promote: "", demote: ""}, gui: {icon: "stick"}, economy: {buyable: [], cost: 0}};
-    $("#menu_side_dropdown_ranks").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + name + "');\" style=\"cursor: pointer;\">" + name + "</a></li>");
-    show_content('ranks', name);
+    ranks_data.Groups[name.replaceAll("\\+", "prplus")] = {permissions: [], inheritance: [], build: true, chat: {prefix: "&r[&7" + name + "&r]", suffix: "", chatColor: "&f", nameColor: "&f"}, level: {promote: "", demote: ""}, gui: {icon: "stick"}, economy: {buyable: [], cost: 0}};
+    $("#menu_side_dropdown_ranks").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + name.replaceAll("\\+", "prplus") + "');\" style=\"cursor: pointer;\">" + name + "</a></li>");
+    show_content('ranks', name.replaceAll("\\+", "prplus"));
 }
 
 function createEmptyUsertag(name) {
@@ -1178,11 +1200,11 @@ function toggleRankPermission(_this, rank, permission) {
 }
 
 function renameRank(rank, new_name) {
-    ranks_data.Groups[new_name] = ranks_data.Groups[rank];
-    delete ranks_data.Groups[rank];
-    $("#menu_side_dropdown_ranks").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + new_name + "');\" style='cursor: pointer;'>" + new_name + "</a></li>");
-    $('#menu_side_dropdown_ranks').children().remove(":contains('" + rank + "'):first()");
-    show_content('ranks', new_name);
+    ranks_data.Groups[new_name.replaceAll("\\+", "prplus")] = ranks_data.Groups[rank.replaceAll("\\+", "prplus")];
+    delete ranks_data.Groups[rank.replaceAll("\\+", "prplus")];
+    $("#menu_side_dropdown_ranks").append("<li class=\"nav-item\"> <a class=\"nav-link\" onclick=\"show_content('ranks', '" + new_name.replaceAll("\\+", "prplus") + "');\" style='cursor: pointer;'>" + new_name.replaceAll("prplus", "+") + "</a></li>");
+    $('#menu_side_dropdown_ranks').children().remove(":contains('" + rank.replaceAll("prplus", "+") + "'):first()");
+    show_content('ranks', new_name.replaceAll("\\+", "prplus"));
 }
 
 function deleteRank(rank) {
