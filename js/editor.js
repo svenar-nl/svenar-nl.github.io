@@ -104,7 +104,7 @@ $(document).ready(function() {
 });
 
 function setup_editor() {
-    var tmp_raw_data_split = atob(raw_data_input).split("\n");
+    var tmp_raw_data_split = decodeUnicode(raw_data_input).split("\n");
     server_data = JSON.parse(tmp_raw_data_split[0]);
     config_data = JSON.parse(tmp_raw_data_split[1]);
     ranks_data = JSON.parse(tmp_raw_data_split[2]);
@@ -859,9 +859,9 @@ function updatePlayerContentGamePreview(player_uuid) {
     $("#content-players-output-chat").html(chat_content);
     $("#content-players-output-tablist").html(tab_content);
 }
-
+//encodeURIComponent
 function saveDataCookie() {
-    var raw_data = "POWERRANKS@" + btoa(JSON.stringify(server_data) + "\n" + JSON.stringify(config_data) + "\n" + JSON.stringify(ranks_data) + "\n" + JSON.stringify(players_data));
+    var raw_data = "POWERRANKS@" + encodeUnicode(JSON.stringify(server_data) + "\n" + JSON.stringify(config_data) + "\n" + JSON.stringify(ranks_data) + "\n" + JSON.stringify(players_data));
     var splitData = [];
     var split_size = 2048;
     do{ splitData.push(raw_data.substring(0, split_size)) } 
@@ -1261,3 +1261,20 @@ function closePrivacyPolicy() {
     $("#popup-privacy-policy").fadeOut();
     setCookie("seen_privacy_policy_notice", "1", 365);
 }
+
+function encodeUnicode(str) {
+    // first we use encodeURIComponent to get percent-encoded UTF-8,
+    // then we convert the percent encodings into raw bytes which
+    // can be fed into btoa.
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+        function toSolidBytes(match, p1) {
+            return String.fromCharCode('0x' + p1);
+    }));
+  }
+
+  function decodeUnicode(str) {
+    // Going backwards: from bytestream, to percent-encoding, to original string.
+    return decodeURIComponent(atob(str).split('').map(function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  }
