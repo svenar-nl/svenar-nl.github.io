@@ -912,6 +912,8 @@ function exportData() {
     for (rank in ranks_data.Groups) {
         ranks_data.Groups[rank.replaceAll("prplus", "+")] = ranks_data.Groups[rank];
 
+        ranks_data.Groups[rank].economy.cost = parseInt(ranks_data.Groups[rank].economy.cost);
+
         if (rank.includes("prplus")) {
             delete ranks_data.Groups[rank];
         }
