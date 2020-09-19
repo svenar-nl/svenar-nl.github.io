@@ -28,6 +28,9 @@
         <title>PowerRanks Editor</title>
         <link rel="stylesheet" href="assets/vendors/mdi/css/materialdesignicons.min.css">
         <link rel="stylesheet" href="assets/vendors/css/vendor.bundle.base.css">
+        <link rel="stylesheet" href="assets/css/bootstrap-tour.min.css">
+        <!-- <link rel="stylesheet" href="assets/css/introjs-dark.css"> -->
+
         <!-- <link rel="stylesheet" href="assets/vensors/css/perfect-scrollbar.min.css" /> -->
         <link rel="stylesheet" href="assets/css/style.css">
         <link rel="shortcut icon" href="assets/images/favicon.png" />
@@ -114,7 +117,7 @@
             </div>
             <div id="popup-privacy-policy" style="position: fixed;top: 0px;left: 0px;width: 100%;height: 100%;z-index: 999990; display: none;">
                 <div style="background-color: black;width: 100%;height: 100%;opacity: 75%;z-index: 999991;position: fixed;"></div>
-                <div style="position: fixed;width: 100%;height: 500px;margin-top: 5%;background-color: #191c24;min-height: 100px;z-index: 999999;text-align: center;overflow-y: auto;">
+                <div id="privacypolicydata">
                     <!-- Begin boring part -->
                     <button class="btn btn-secondary" onclick="closePrivacyPolicy();" style="width: 100%;">Close</button>
                     <h1>Cookies</h1>
@@ -279,7 +282,7 @@
         <!-- Editor content -->
         <div class="container-scroller">
             <nav class="sidebar sidebar-offcanvas" id="sidebar">
-                <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
+                <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top" id="tutorial-step-1">
                     <a class="sidebar-brand brand-logo" href="#">
                         <h3 style="color: #FFF;margin-bottom: 0px;">PowerRanks Editor</h3>
                     </a>
@@ -287,7 +290,7 @@
                         <h3 style="color: #FFF;margin-bottom: 0px;">PRE</h3>
                     </a>
                 </div>
-                <ul class="nav">
+                <ul class="nav" id="tutorial-step-2">
                     <li class="nav-item profile">
                         <div class="profile-desc">
                             <div class="profile-pic">
@@ -306,7 +309,7 @@
                         <span class="nav-link">Navigation</span>
                     </li>
                     <li class="nav-item menu-items">
-                        <a class="nav-link" onclick="show_content('dashboard', '');" style="cursor: pointer;">
+                        <a class="nav-link" onclick="show_content('dashboard', '');" style="cursor: pointer;" id="tutorial-step-3">
                         <span class="menu-icon">
                         <i class="mdi mdi-chart-bar"></i>
                         </span>
@@ -314,7 +317,7 @@
                         </a>
                     </li>
                     <li class="nav-item menu-items">
-                        <a class="nav-link" data-toggle="collapse" href="#ui-config" aria-expanded="false" aria-controls="ui-config">
+                        <a class="nav-link" data-toggle="collapse" href="#ui-config" aria-expanded="false" aria-controls="ui-config" id="tutorial-step-4">
                         <span class="menu-icon">
                         <i class="mdi mdi-code-braces"></i>
                         </span>
@@ -328,7 +331,7 @@
                         </div>
                     </li>
                     <li class="nav-item menu-items">
-                        <a class="nav-link" data-toggle="collapse" href="#ui-ranks" aria-expanded="false" aria-controls="ui-ranks">
+                        <a class="nav-link" data-toggle="collapse" href="#ui-ranks" aria-expanded="false" aria-controls="ui-ranks" id="tutorial-step-5">
                         <span class="menu-icon">
                         <i class="mdi mdi-laptop"></i>
                         </span>
@@ -345,7 +348,7 @@
                         </div>
                     </li>
                     <li class="nav-item menu-items">
-                        <a class="nav-link" data-toggle="collapse" href="#ui-tags" aria-expanded="false" aria-controls="ui-tags">
+                        <a class="nav-link" data-toggle="collapse" href="#ui-tags" aria-expanded="false" aria-controls="ui-tags" id="tutorial-step-6">
                         <span class="menu-icon">
                         <i class="mdi mdi-face"></i>
                         </span>
@@ -362,7 +365,7 @@
                         </div>
                     </li>
                     <li class="nav-item menu-items">
-                        <a class="nav-link" data-toggle="collapse" href="#ui-players" aria-expanded="false" aria-controls="ui-players">
+                        <a class="nav-link" data-toggle="collapse" href="#ui-players" aria-expanded="false" aria-controls="ui-players" id="tutorial-step-7">
                         <span class="menu-icon">
                         <i class="mdi mdi-account-multiple"></i>
                         </span>
@@ -399,8 +402,11 @@
                         <!-- <h1 style="margin-top: 10px;">BETA</h1> -->
                         <ul class="navbar-nav navbar-nav-right">
                             <li class="nav-item">
+                                <a type="button" id="tutorial-step-11" onclick="showHelpTour();" class="mdi mdi-help-circle-outline" style="font-size: 25px;margin-right: 15px;margin-top: 3px;color: #3aa4de;"></a>
+                            </li>
+                            <li class="nav-item">
                                 <div class="btn-group">
-                                    <button class="btn btn-danger" onclick="$('#popup-exit').fadeIn();">Exit</button>
+                                    <button id="tutorial-step-8" class="btn btn-danger" onclick="$('#popup-exit').fadeIn();">Exit</button>
                                     <button id="editorsavedatabutton" class="btn btn-primary" onclick="$('#popup-save').fadeIn();">Save</button>
                                     <button id="editorexportdatabutton" class="btn btn-success" onclick="$('#popup-exporting').fadeIn();exportData();">Export</button>
                                 </div>
@@ -444,13 +450,13 @@
                               </div>
                             </div>
                             </div> -->
-                            <div class="row">
+                            <!-- Start BETA header -->
+                            <!-- <div class="row">
                                 <div class="col-12 grid-margin stretch-card">
                                 <div class="card corona-gradient-card">
                                     <div class="card-body py-0 px-0 px-sm-3">
                                     <div class="row align-items-center">
                                         <div class="col-4 col-sm-3 col-xl-2" style="height: 80px;">
-                                        <!-- <img src="assets/images/dashboard/beta.png" class="gradient-corona-img img-fluid" alt=""> -->
                                         </div>
                                         <div class="col-5 col-sm-7 col-xl-8 p-0">
                                         <h4 class="mb-1 mb-sm-0">Welcome to the PowerRanks web editor BETA</h4>
@@ -466,11 +472,11 @@
                                     </div>
                                 </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <!-- End BETA header -->
                         <div id="content-dashboard">
                             <div class="row">
-                                <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                                <div id="help-dashboard-1" class="col-xl-3 col-sm-6 grid-margin stretch-card">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
@@ -490,7 +496,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                                <div id="help-dashboard-2" class="col-xl-3 col-sm-6 grid-margin stretch-card">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
@@ -509,7 +515,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                                <div id="help-dashboard-3" class="col-xl-3 col-sm-6 grid-margin stretch-card">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
@@ -528,7 +534,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+                                <div id="help-dashboard-4" class="col-xl-3 col-sm-6 grid-margin stretch-card">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="row">
@@ -549,7 +555,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12 col-lg-5 grid-margin stretch-card">
+                                <div class="col-md-12 col-lg-5 grid-margin stretch-card" id="help-dashboard-5">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="chartjs-size-monitor">
@@ -565,7 +571,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-12 col-lg-7 grid-margin stretch-card">
+                                <div class="col-md-12 col-lg-7 grid-margin stretch-card" id="help-dashboard-6">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="d-flex flex-row justify-content-between">
@@ -582,7 +588,7 @@
                         </div>
                         <div id="content-configuration">
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-12" id="help-configuration-1">
                                     <div class="card">
                                         <h1 class="card-title" style="text-align: center;"><span id="content-configuration-item">-</span> configuration</h1>
                                         <div id="content-configuration-body" class="card-body"></div>
@@ -931,6 +937,7 @@
         <script src="js/autocomplete.js"></script>
         <script src="js/minecraft_items.js"></script>
         <script src="js/editor.js"></script>
+        <script type="text/javascript" src="js/bootstrap-tour.min.js"></script>
         <script src="js/tutorial.js"></script>
     </body>
 </html>

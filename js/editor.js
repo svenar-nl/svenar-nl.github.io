@@ -325,6 +325,8 @@ function create_dashoard_errorcard(title, msg, location) {
 }
 
 function show_content(page, item) {
+    helpTourCurrentPage = page.toLowerCase();
+    
     if (page.toLowerCase() === "dashboard") {
         $("#content-dashboard").show();
         $("#content-configuration").hide();
