@@ -988,8 +988,32 @@ function replaceOnPage(search, replacement) {
 }
 
 function formatMinecraftColor(input) {
+    var output = "";
     input = "&f" + input;
-    var input_split = input.split("&");
+
+    // HEX Colors
+    output = input;
+
+    var hex_reg = new RegExp("#[a-fA-F0-9]{6}", "gm");
+    var hex_match;
+    while (hex_match = hex_reg.exec(input)) {
+        console.log("Found", hex_match[0], "at", hex_match.index);
+
+        var msg = "";
+        for (var i = hex_match.index + 7; i < input.length; i++) {
+            if (input[i] != "#" && input[i] != "&") {
+                msg += input[i];
+            } else {
+                break;
+            }
+        }
+        output = output.replace(hex_match[0] + msg, "<span style=\"color:" + hex_match[0] + "\">" + msg + "</span>")
+    }
+    output += "</span>"
+    // HEX Colors
+
+    // Normal MC Colors
+    var input_split = output.split("&");
     for (var val in input_split) {
         if (input_split[val].length > 0) {
             var color = input_split[val][0];
@@ -999,7 +1023,10 @@ function formatMinecraftColor(input) {
         }
     }
 
-    return input_split.join("");
+    output = input_split.join("");
+    // Normal MC Colors
+
+    return output;
 }
 
 function minecraftColorToCSS(color) {
