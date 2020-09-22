@@ -1229,6 +1229,10 @@ function toggleRankPermission(_this, rank, permission) {
     }
 }
 
+function setDefaultRank(rank_name) {
+    ranks_data.Default = rank_name;
+}
+
 function renameRank(rank, new_name) {
     ranks_data.Groups[new_name.replaceAll("\\+", "prplus")] = ranks_data.Groups[rank.replaceAll("\\+", "prplus")];
     delete ranks_data.Groups[rank.replaceAll("\\+", "prplus")];
@@ -1241,6 +1245,14 @@ function deleteRank(rank) {
     delete ranks_data.Groups[rank];
     $('#menu_side_dropdown_ranks').children().remove(":contains('" + rank + "'):first()");
     show_content('dashboard', "");
+}
+
+function updateRankList(select_element_identifier) {
+    var select_element = $(select_element_identifier);
+    select_element.html("");
+    for (var rank in ranks_data.Groups) {
+        select_element.html(select_element.html() + "<option value=\"" + rank + "\" " + (ranks_data.Default == rank ? "selected" : "") + ">" + rank.replaceAll("prplus", "+") + "</option>");
+    }
 }
 
 function addRankInheritance(select_id, rank) {
