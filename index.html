@@ -234,6 +234,35 @@
                 </div>
             </div>
         </div>
+
+        <div id="powerranks-color-tool-background" style="display: none;position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;background-color: #00000073;z-index: 999998;" onclick="closeColorTool();"></div>
+        <div id="powerranks-color-tool" style="display: none;">
+            <button id="powerranks-color-tool-btn-close" class="btn" onclick="closeColorTool();">Close</button>
+            <h1 style="text-align: center;margin-bottom: -10px;">Gradient<small style="font-size: 10px;">BETA</small></h1>
+            <span>Input:</span><br />
+            <input type="text" id="powerranks-color-tool-simple-gradient-input" onchange="updateGradientPreview();" class="form-control" style="background-color: #4c5569;">
+            <br />
+            <span>Color #1:</span><br />
+            <input type="range" min="0" max="255" value="0" class="slider slider-red" id="powerranks-color-tool-simple-gradient-color1-red" onchange="updateGradientPreview();">
+            <br />
+            <input type="range" min="0" max="255" value="0" class="slider slider-green" id="powerranks-color-tool-simple-gradient-color1-green" onchange="updateGradientPreview();">
+            <br />
+            <input type="range" min="0" max="255" value="255" class="slider slider-blue" id="powerranks-color-tool-simple-gradient-color1-blue" onchange="updateGradientPreview();">
+            <br />
+            <span>Color #2:</span><br />
+            <input type="range" min="0" max="255" value="255" class="slider slider-red" id="powerranks-color-tool-simple-gradient-color2-red" onchange="updateGradientPreview();">
+            <br />
+            <input type="range" min="0" max="255" value="0" class="slider slider-green" id="powerranks-color-tool-simple-gradient-color2-green" onchange="updateGradientPreview();">
+            <br />
+            <input type="range" min="0" max="255" value="0" class="slider slider-blue" id="powerranks-color-tool-simple-gradient-color2-blue" onchange="updateGradientPreview();">
+            <br />
+            <br />
+            <span>Preview:</span><br />
+            <div id="powerranks-color-tool-simple-gradient-preview" style="width: 100%;text-align: center;"></div>
+            <button id="powerranks-color-tool-btn-apply" class="btn" onclick="applySteppedGradient(); closeColorTool();">Apply</button>
+            
+        </div>
+
         <div id="noidoverlayloading" style="display: none; position: fixed;width: 100%;height: 100%;z-index: 999999;background-color: #191c24;">
             <div class="loader-demo-box" style="height: 100%;border: 0px solid #191c24 !important;">
                 <div class="pixel-loader"></div>
@@ -295,7 +324,7 @@
                         <div class="profile-desc">
                             <div class="profile-pic">
                                 <div class="count-indicator">
-                                    <img class="img-xs rounded-circle " src="assets/images/PowerRanksLogoRound.png" alt="">
+                                    <img class="img-xs rounded-circle" src="assets/images/PowerRanksLogoRound.png" alt="">
                                     <span class="count bg-success"></span>
                                 </div>
                                 <div class="profile-name">
@@ -936,6 +965,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
         <script src="js/autocomplete.js"></script>
         <script src="js/minecraft_items.js"></script>
+        <script src="js/colorTool.js"></script>
         <script src="js/editor.js"></script>
         <script type="text/javascript" src="js/bootstrap-tour.min.js"></script>
         <script src="js/tutorial.js"></script>

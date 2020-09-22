@@ -361,8 +361,8 @@ function show_content(page, item) {
 
         $("#content-ranks-table-rank-name").html("<input type=\"text\" class=\"form-control\" value=\"" + item.replaceAll("prplus", "+") + "\" onchange=\"renameRank('" + item + "', $(this).val());\" />");
         $("#content-ranks-table-rank-build").html("<input class=\"checkbox-input checkbox-ranks-build-enable\" type=\"checkbox\" " + (ranks_data.Groups[item].build ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-ranks-build-enable').attr('checked', !$('.checkbox-ranks-build-enable').attr('checked')); ranks_data.Groups['" + item + "'].build = !!$('.checkbox-ranks-build-enable').attr('checked');\"></span>");
-        $("#content-ranks-table-rank-prefix").html("<input type=\"text\" class=\"form-control\" value=\"" + ranks_data.Groups[item].chat.prefix + "\" onchange=\"ranks_data.Groups['" + item + "'].chat.prefix = $(this).val(); $('#content-ranks-table-rank-prefix-preview').html(formatMinecraftColor(ranks_data.Groups['" + item + "'].chat.prefix));\" />");
-        $("#content-ranks-table-rank-suffix").html("<input type=\"text\" class=\"form-control\" value=\"" + ranks_data.Groups[item].chat.suffix + "\" onchange=\"ranks_data.Groups['" + item + "'].chat.suffix = $(this).val(); $('#content-ranks-table-rank-suffix-preview').html(formatMinecraftColor(ranks_data.Groups['" + item + "'].chat.suffix));\" />");
+        $("#content-ranks-table-rank-prefix").html("<input type=\"text\" class=\"form-control\" style=\"width: calc(100% - 58px);\" value=\"" + ranks_data.Groups[item].chat.prefix + "\" onchange=\"ranks_data.Groups['" + item + "'].chat.prefix = $(this).val(); $('#content-ranks-table-rank-prefix-preview').html(formatMinecraftColor(ranks_data.Groups['" + item + "'].chat.prefix));\" /><a class=\"mdi mdi-format-color-highlight\" type=\"button\" style=\"position: relative;float: right;font-size: 30px;margin-top: -41px;border: 1px solid;padding-top: 7px;padding-left: 6px;padding-right: 6px;background-color: #191c24;border-radius: 10px;\" onclick=\"openColorTool(this, $(this).parent().attr('id'), 'input');\"></a>");
+        $("#content-ranks-table-rank-suffix").html("<input type=\"text\" class=\"form-control\" style=\"width: calc(100% - 58px);\" value=\"" + ranks_data.Groups[item].chat.suffix + "\" onchange=\"ranks_data.Groups['" + item + "'].chat.suffix = $(this).val(); $('#content-ranks-table-rank-suffix-preview').html(formatMinecraftColor(ranks_data.Groups['" + item + "'].chat.suffix));\" /><a class=\"mdi mdi-format-color-highlight\" type=\"button\" style=\"position: relative;float: right;font-size: 30px;margin-top: -41px;border: 1px solid;padding-top: 7px;padding-left: 6px;padding-right: 6px;background-color: #191c24;border-radius: 10px;\" onclick=\"openColorTool(this, $(this).parent().attr('id'), 'input');\"></a>");
         $("#content-ranks-table-rank-chatcolor-color").attr("onchange", "if(ranks_data.Groups['" + item + "'].chat.chatColor.match('[0-9a-fA-F]')){if($(this).val().length > 0){ranks_data.Groups['" + item + "'].chat.chatColor = ranks_data.Groups['" + item + "'].chat.chatColor.replaceAt(ranks_data.Groups['" + item + "'].chat.chatColor.match('[0-9a-fA-F]').index-1, $(this).val());}else{ranks_data.Groups['" + item + "'].chat.chatColor = ranks_data.Groups['" + item + "'].chat.chatColor.replaceAt(ranks_data.Groups['" + item + "'].chat.chatColor.match('[0-9a-fA-F]').index-1, '  ').replaceAll('  ', '');}}else{ranks_data.Groups['" + item + "'].chat.chatColor=$(this).val()+ranks_data.Groups['" + item + "'].chat.chatColor;}");
         $("#content-ranks-table-rank-chatcolor-special").attr("onchange", "if(ranks_data.Groups['" + item + "'].chat.chatColor.match('[LlMmNnOoKk]')){if($(this).val().length > 0){ranks_data.Groups['" + item + "'].chat.chatColor = ranks_data.Groups['" + item + "'].chat.chatColor.replaceAt(ranks_data.Groups['" + item + "'].chat.chatColor.match('[LlMmNnOoKk]').index-1, $(this).val());}else{ranks_data.Groups['" + item + "'].chat.chatColor = ranks_data.Groups['" + item + "'].chat.chatColor.replaceAt(ranks_data.Groups['" + item + "'].chat.chatColor.match('[LlMmNnOoKk]').index-1, '  ').replaceAll('  ', '');}}else{ranks_data.Groups['" + item + "'].chat.chatColor=ranks_data.Groups['" + item + "'].chat.chatColor+$(this).val();}");
         $("#content-ranks-table-rank-namecolor-color").attr("onchange", "if(ranks_data.Groups['" + item + "'].chat.nameColor.match('[0-9a-fA-F]')){if($(this).val().length > 0){ranks_data.Groups['" + item + "'].chat.nameColor = ranks_data.Groups['" + item + "'].chat.nameColor.replaceAt(ranks_data.Groups['" + item + "'].chat.nameColor.match('[0-9a-fA-F]').index-1, $(this).val());}else{ranks_data.Groups['" + item + "'].chat.nameColor = ranks_data.Groups['" + item + "'].chat.nameColor.replaceAt(ranks_data.Groups['" + item + "'].chat.nameColor.match('[0-9a-fA-F]').index-1, '  ').replaceAll('  ', '');}}else{ranks_data.Groups['" + item + "'].chat.nameColor=$(this).val()+ranks_data.Groups['" + item + "'].chat.nameColor;}");
@@ -499,8 +499,9 @@ function show_content(page, item) {
         content += "<div class=\"card-body\">";
         content += "<button class=\"btn btn-danger\" onclick=\"delete ranks_data.Usertags['" + item + "']; $('#menu_side_dropdown_usertags').children().remove(':contains(" + item + "):first()'); show_content('dashboard', '');\" style=\"left: 40%;width: 20%;position: absolute;\">Delete</button>";
         content += "<table class=\"table table-bordered\" style=\"margin-top: 45px;\"><thead><tr><th scope=\"col\">Key</th><th scope=\"col\">Value</th><th scope=\"col\">Description</th></tr></thead><tbody>";
-        content += "<tr><td>Format</td><td>";
-        content += "<input class=\"form-control\" type=\"text\" value=\"" + ranks_data.Usertags[item] + "\" onchange=\"ranks_data.Usertags['" + item + "'] = this.value; $('.usertag-format-preview').html(formatMinecraftColor(ranks_data.Usertags['" + item + "']));\" style=\"width: 100%;\">";
+        content += "<tr><td>Format</td><td id=\"usertag-input-field\">";
+        content += "<input class=\"form-control\" type=\"text\" style=\"width: calc(100% - 58px);\" value=\"" + ranks_data.Usertags[item] + "\" onchange=\"ranks_data.Usertags['" + item + "'] = this.value; $('.usertag-format-preview').html(formatMinecraftColor(ranks_data.Usertags['" + item + "']));\" style=\"width: 100%;\">";
+        content += "<a class=\"mdi mdi-format-color-highlight\" type=\"button\" style=\"position: relative;float: right;font-size: 30px;margin-top: -41px;border: 1px solid;padding-top: 7px;padding-left: 6px;padding-right: 6px;background-color: #191c24;border-radius: 10px;\" onclick=\"openColorTool(this, $(this).parent().attr('id'), 'input');\"></a>";
         content += "</td><td>Change the look of this usertag<br /><br />Preview: <span class=\"usertag-format-preview\" style=\"background-color: #5f4225;\"></span></td></tr>";
         content += "</tbody></table>";
         content += "</div>";
@@ -997,8 +998,6 @@ function formatMinecraftColor(input) {
     var hex_reg = new RegExp("#[a-fA-F0-9]{6}", "gm");
     var hex_match;
     while (hex_match = hex_reg.exec(input)) {
-        console.log("Found", hex_match[0], "at", hex_match.index);
-
         var msg = "";
         for (var i = hex_match.index + 7; i < input.length; i++) {
             if (input[i] != "#" && input[i] != "&") {
@@ -1007,9 +1006,9 @@ function formatMinecraftColor(input) {
                 break;
             }
         }
-        output = output.replace(hex_match[0] + msg, "<span style=\"color:" + hex_match[0] + "\">" + msg + "</span>")
+        output = output.replace(hex_match[0] + msg, "<span style=\"color:" + hex_match[0] + "\">" + msg + "</span>");
     }
-    output += "</span>"
+    output += "</span>";
     // HEX Colors
 
     // Normal MC Colors
@@ -1036,7 +1035,7 @@ function minecraftColorToCSS(color) {
     if (color.match("[0-9a-fA-F]") !== null) {
         switch (color) {
             case "0":
-                colorOut = "#000";
+                colorOut = "#000000";
                 break;
             case "1":
                 colorOut = "#0000AA";
@@ -1084,7 +1083,7 @@ function minecraftColorToCSS(color) {
                 colorOut = "#FFF";
                 break;
             default:
-                colorOut = "#FFF";
+                colorOut = "#FFFFFF";
                 break;
         }
     }
