@@ -676,7 +676,7 @@ var drag_interval;
 var draging_element;
 var drop_target;
 
-function drag_element(self, target_element, output_element, input_format) {
+function drag_element(self, target_element, output_element, input_format, type) {
     target_element = $(target_element);
     stop_drag(target_element, output_element);
 
@@ -699,19 +699,32 @@ function drag_element(self, target_element, output_element, input_format) {
         //         $(this).css({"visibility": "hidden"});
         //     }
         // });
+
+        $(".drop-here-placeholder").each(function(index){
+            if (mouseX > $(this).show().offset().left - 25 && mouseX < $(this).show().offset().left + 50 + $(this).show().width()) {
+                // $(this).show();
+                $(this).css({"color": "#F2F2F2"});
+            } else {
+                // $(this).hide();
+                $(this).css({"color": "#666"});
+            }
+        });
     }, 1);
 
-    setup_drag_format("#" + target_element.attr('id'), output_element, input_format, input_format, true);
+    setup_drag_format("#" + target_element.attr('id'), output_element, input_format, input_format, type, true);
 }
 
-function setup_drag_format(target_element, output_element, input, input_format, drop_placeholders) {
+function setup_drag_format(target_element, output_element, input, input_format, type, drop_placeholders) {
     target_element = $(target_element);
-    var drop_here_element = "<span id=\"drop-place-%d%\" class=\"drop-here-placeholder\" onmouseenter=\"drop_target = $(this);\" onmouseout=\"drop_target = null;\" onmouseup=\"stop_drag('#" + target_element.attr('id') + "', '" + output_element + "', '" + input_format + "');\" style=\"border: 1px dashed;position: relative;padding: 5px;border-radius: 15px;z-index: 2;\">+</span>";
+    var drop_here_element = "<span id=\"drop-place-%d%\" class=\"drop-here-placeholder\" onmouseenter=\"drop_target = $(this);\" onmouseout=\"drop_target = null;\" onmouseup=\"stop_drag('#" + target_element.attr('id') + "', '" + output_element + "', '" + input_format + "', '" + type + "');\" style=\"border: 1px dashed;position: relative;padding: 5px;border-radius: 15px;z-index: 2;display: none;\">+</span>";
     var config_element = "<span id=\"edit-format-dragdrop-%id%\" class=\"draggable-element\" style=\"display: %display%;\">%d%<span style=\"background-color: #cc0909;border-radius: 15px;padding: 2px;margin-left: 5px;cursor: pointer;\" onclick=\"%c%\">x</span></span>";    
     var body = "";
     var input_split = [];
     var element_to_add = "";
     var element_to_add_index;
+    if (input == undefined) {
+        return;
+    }
 
     if (input.includes("+")) {
         input_split = input.split("+")[0].split(" ");
@@ -720,7 +733,19 @@ function setup_drag_format(target_element, output_element, input, input_format, 
 
         if (element_to_add.length > 0) {
             input_split.splice(element_to_add_index, 0, element_to_add);
-            input_format = input_split.join(" ");
+
+            if (type.toLowerCase().includes("chat")) {
+                config_data.chat.format = input_split.join(" ");
+                setup_drag_format(target_element, output_element, config_data.chat.format, config_data.chat.format, type, drop_placeholders);
+            }
+
+            if (type.toLowerCase().includes("tablist")) {
+                config_data.tablist_modification.format = input_split.join(" ");
+                setup_drag_format(target_element, output_element, config_data.tablist_modification.format, config_data.tablist_modification.format, type, drop_placeholders);
+            }
+            updateConfigContentBody(type);
+            return;
+            // input_format = input_split.join(" ");
         }
         
     } else if (input.includes("-")) {
@@ -728,7 +753,18 @@ function setup_drag_format(target_element, output_element, input, input_format, 
         var remove_index = parseInt(input.split("-")[1].replace("edit-format-dragdrop-", ""));
         input_split.splice(remove_index, 1);
 
-        input_format = input_split.join(" ");
+        if (type.toLowerCase().includes("chat")) {
+            config_data.chat.format = input_split.join(" ");
+            setup_drag_format(target_element, output_element, config_data.chat.format, config_data.chat.format, type, drop_placeholders);
+        }
+
+        if (type.toLowerCase().includes("tablist")) {
+            config_data.tablist_modification.format = input_split.join(" ");
+            setup_drag_format(target_element, output_element, config_data.tablist_modification.format, config_data.tablist_modification.format, type, drop_placeholders);
+        }
+        updateConfigContentBody(type);
+        return;
+        // input_format = input_split.join(" ");
     } else {
         input_split = input.split(" ");
     }
@@ -747,7 +783,7 @@ function setup_drag_format(target_element, output_element, input, input_format, 
             if (drop_placeholders) {
                 body += drop_here_element.replace("%d%", drop_here_element_index);
             }
-            body += config_element.replace("%d%", input_split[i]).replace("%display%", display).replace("%id%", i).replace("%c%", "setup_drag_format('#" + target_element.attr("id") + "', '" + output_element + "', '" + input_split.join(' ') + "' + '-' + " + i + ", '" + input_format + "', false);");
+            body += config_element.replace("%d%", input_split[i]).replace("%display%", display).replace("%id%", i).replace("%c%", "setup_drag_format('#" + target_element.attr("id") + "', '" + output_element + "', '" + input_split.join(' ') + "' + '-' + " + i + ", '" + input_format + "', '" + type + "', false);");
         }
         drop_here_element_index += 1;
     }
@@ -767,7 +803,7 @@ function setup_drag_format(target_element, output_element, input, input_format, 
     $(output_element).text(input_format);
 }
 
-function stop_drag(target_element, output_element, input_format) {
+function stop_drag(target_element, output_element, input_format, type) {
     target_element = $(target_element);
     if (drag_interval != null) {
         clearInterval(drag_interval);
@@ -782,9 +818,9 @@ function stop_drag(target_element, output_element, input_format) {
         drag_interval = null;
 
         if (drop_target != null) {
-            setup_drag_format("#" + target_element.attr('id'), output_element, input_format + "+" + pr_format + "@" + drop_target.attr("id"), input_format, false);
+            setup_drag_format("#" + target_element.attr('id'), output_element, input_format + "+" + pr_format + "@" + drop_target.attr("id"), input_format, type, false);
         } else {
-            setup_drag_format("#" + target_element.attr('id'), output_element, input_format, input_format, false);
+            setup_drag_format("#" + target_element.attr('id'), output_element, input_format, input_format, type, false);
         }
     }
 }
@@ -812,18 +848,18 @@ function updateConfigContentBody(config_item) {
             body += "<td>Format</td>";
             body += "<td>";
             body += "Elements: <div style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
-            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Player name<small>[player]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">World name<small>[world]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Usertag<small>[usertag]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Rank prefix<small>[prefix]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Rank suffix<small>[suffix]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Subrank prefix<small>[subprefix]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Subrank suffix<small>[subsuffix]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Chat message<small>[msg]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\"><input placeholder=\"Custom text &#187;\" style=\"border: 0px;border-radius: 15px;color: #F2F2F2;background-color: #000;width: 100px;\"/></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">Player name<small>[player]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">World name<small>[world]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">Usertag<small>[usertag]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">Rank prefix<small>[prefix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">Rank suffix<small>[suffix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">Subrank prefix<small>[subprefix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">Subrank suffix<small>[subsuffix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">Chat message<small>[msg]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\"><input placeholder=\"Custom text &#187;\" style=\"border: 0px;border-radius: 15px;color: #F2F2F2;background-color: #000;width: 100px;\"/></span>";
             body += "</div><br /><br /><br />";
             body += "Format:<div id=\"chat-format-droppable\" style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
-            body += "<img src  onerror=\"setup_drag_format('#chat-format-droppable', '#chat-output', config_data.chat.format, '" + config_data.chat.format + "', false);\">"; // Dirty trick
+            body += "<img src  onerror=\"setup_drag_format('#chat-format-droppable', '#chat-output', config_data.chat.format, '" + config_data.chat.format + "', 'chat', false);\">"; // Dirty trick
             body += "</div><br /><br /><br />";
             body += "Output: <span id=\"chat-output\" style=\"color: #F2F2F2;\">" + config_data.chat.format + "</span>";
             body += "</td>";
@@ -848,17 +884,17 @@ function updateConfigContentBody(config_item) {
             body += "<td>Format</td>";
             body += "<td>";
             body += "Elements: <div style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
-            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Player name<small>[player]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">World name<small>[world]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Usertag<small>[usertag]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Rank prefix<small>[prefix]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Rank suffix<small>[suffix]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Subrank prefix<small>[subprefix]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Subrank suffix<small>[subsuffix]</small></span>";
-            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\"><input placeholder=\"Custom text &#187;\" style=\"border: 0px;border-radius: 15px;color: #F2F2F2;background-color: #000;width: 100px;\"/></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" class=\"draggable-element\">Player name<small>[player]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" class=\"draggable-element\">World name<small>[world]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" class=\"draggable-element\">Usertag<small>[usertag]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" class=\"draggable-element\">Rank prefix<small>[prefix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" class=\"draggable-element\">Rank suffix<small>[suffix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" class=\"draggable-element\">Subrank prefix<small>[subprefix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" class=\"draggable-element\">Subrank suffix<small>[subsuffix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist');\" class=\"draggable-element\"><input placeholder=\"Custom text &#187;\" style=\"border: 0px;border-radius: 15px;color: #F2F2F2;background-color: #000;width: 100px;\"/></span>";
             body += "</div><br /><br /><br />";
             body += "Format:<div id=\"tablist-format-droppable\" style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
-            body += "<img src  onerror=\"setup_drag_format('#tablist-format-droppable', '#tablist-output', config_data.tablist_modification.format, '" + config_data.tablist_modification.format + "', false);\">"; // Dirty trick
+            body += "<img src  onerror=\"setup_drag_format('#tablist-format-droppable', '#tablist-output', config_data.tablist_modification.format, '" + config_data.tablist_modification.format + "', 'tablist', false);\">"; // Dirty trick
             body += "</div><br /><br /><br />";
             body += "Output: <span id=\"tablist-output\" style=\"color: #F2F2F2;\">" + config_data.tablist_modification.format + "</span>";
             body += "</td>";
