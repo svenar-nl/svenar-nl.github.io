@@ -700,10 +700,18 @@ function drag_element(self, target_element, output_element, input_format, type) 
         //     }
         // });
 
+        var has_selected = false;
+        drop_target = null;
         $(".drop-here-placeholder").each(function(index){
-            if (mouseX > $(this).show().offset().left - 25 && mouseX < $(this).show().offset().left + 50 + $(this).show().width()) {
+            if ((mouseX > $(this).show().offset().left - 25 && mouseX < $(this).show().offset().left + 50 + $(this).show().width()) && (mouseY > $(this).show().offset().top - 50 && mouseY < $(this).show().offset().top + 50)) {
                 // $(this).show();
-                $(this).css({"color": "#F2F2F2"});
+                if (!has_selected) {
+                    $(this).css({"color": "#F2F2F2"});
+                    has_selected = true;
+                    drop_target = $(this);
+                } else {
+                    $(this).css({"color": "#666"});
+                }
             } else {
                 // $(this).hide();
                 $(this).css({"color": "#666"});
@@ -716,7 +724,8 @@ function drag_element(self, target_element, output_element, input_format, type) 
 
 function setup_drag_format(target_element, output_element, input, input_format, type, drop_placeholders) {
     target_element = $(target_element);
-    var drop_here_element = "<span id=\"drop-place-%d%\" class=\"drop-here-placeholder\" onmouseenter=\"drop_target = $(this);\" onmouseout=\"drop_target = null;\" onmouseup=\"stop_drag('#" + target_element.attr('id') + "', '" + output_element + "', '" + input_format + "', '" + type + "');\" style=\"border: 1px dashed;position: relative;padding: 5px;border-radius: 15px;z-index: 2;display: none;\">+</span>";
+    // var drop_here_element = "<span id=\"drop-place-%d%\" class=\"drop-here-placeholder\" onmouseenter=\"drop_target = $(this);\" onmouseout=\"drop_target = null;\" onmouseup=\"stop_drag('#" + target_element.attr('id') + "', '" + output_element + "', '" + input_format + "', '" + type + "');\" style=\"border: 1px dashed;position: relative;padding: 5px;border-radius: 15px;z-index: 2;display: none;\">+</span>";
+    var drop_here_element = "<span id=\"drop-place-%d%\" class=\"drop-here-placeholder\" onmouseup=\"stop_drag('#" + target_element.attr('id') + "', '" + output_element + "', '" + input_format + "', '" + type + "');\" style=\"border: 1px dashed;position: relative;padding: 5px;border-radius: 15px;z-index: 2;display: none;\">+</span>";
     var config_element = "<span id=\"edit-format-dragdrop-%id%\" class=\"draggable-element\" style=\"display: %display%;\">%d%<span style=\"background-color: #cc0909;border-radius: 15px;padding: 2px;margin-left: 5px;cursor: pointer;\" onclick=\"%c%\">x</span></span>";    
     var body = "";
     var input_split = [];
