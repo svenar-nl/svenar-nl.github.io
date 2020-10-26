@@ -101,6 +101,8 @@ $(document).ready(function() {
     $(window).resize(function() {
         $("#content-players-output-div-tablist").css("bottom", $("#content-players-output-image").height());
     });
+
+    document.addEventListener('mousemove', updateMousePosition);
 });
 
 function setup_editor() {
@@ -726,7 +728,7 @@ function setup_drag_format(target_element, output_element, input, input_format, 
     target_element = $(target_element);
     // var drop_here_element = "<span id=\"drop-place-%d%\" class=\"drop-here-placeholder\" onmouseenter=\"drop_target = $(this);\" onmouseout=\"drop_target = null;\" onmouseup=\"stop_drag('#" + target_element.attr('id') + "', '" + output_element + "', '" + input_format + "', '" + type + "');\" style=\"border: 1px dashed;position: relative;padding: 5px;border-radius: 15px;z-index: 2;display: none;\">+</span>";
     var drop_here_element = "<span id=\"drop-place-%d%\" class=\"drop-here-placeholder\" onmouseup=\"stop_drag('#" + target_element.attr('id') + "', '" + output_element + "', '" + input_format + "', '" + type + "');\" style=\"border: 1px dashed;position: relative;padding: 5px;border-radius: 15px;z-index: 2;display: none;\">+</span>";
-    var config_element = "<span id=\"edit-format-dragdrop-%id%\" class=\"draggable-element\" style=\"display: %display%;\">%d%<span style=\"background-color: #cc0909;border-radius: 15px;padding: 2px;margin-left: 5px;cursor: pointer;\" onclick=\"%c%\">x</span></span>";    
+    var config_element = "<span id=\"edit-format-dragdrop-%id%\" class=\"notdraggable-element\" style=\"display: %display%;\">%d%<span style=\"background-color: #cc0909;border-radius: 15px;padding: 2px;margin-left: 5px;cursor: pointer;\" onclick=\"%c%\">x</span></span>";    
     var body = "";
     var input_split = [];
     var element_to_add = "";
@@ -840,8 +842,6 @@ function updateMousePosition(event) {
 }
 
 function updateConfigContentBody(config_item) {
-    document.addEventListener('mousemove', updateMousePosition);
-
     var body = "<table class=\"table table-bordered\"><thead><tr><th scope=\"col\">Key</th><th scope=\"col\">Value</th><th scope=\"col\">Description</th></tr></thead><tbody>";
     var error = false;
 
@@ -856,7 +856,7 @@ function updateConfigContentBody(config_item) {
             body += "<tr>";
             body += "<td>Format</td>";
             body += "<td>";
-            body += "Elements: <div style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
+            body += "Elements: <div id=\"help-config-draggable-elements\" style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
             body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">Player name<small>[player]</small></span>";
             body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">World name<small>[world]</small></span>";
             body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "', 'chat');\" class=\"draggable-element\">Usertag<small>[usertag]</small></span>";
@@ -892,7 +892,7 @@ function updateConfigContentBody(config_item) {
             body += "<tr>";
             body += "<td>Format</td>";
             body += "<td>";
-            body += "Elements: <div style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
+            body += "Elements: <div id=\"help-config-draggable-elements\" style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
             // onmouseenter=\"$(this).css({'background-color': '#232323'});\" onmouseout=\"$(this).css({'background-color': '#000'});\"
             body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist_modification');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist_modification');\" class=\"draggable-element\">Player name<small>[player]</small></span>";
             body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist_modification');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist_modification');\" class=\"draggable-element\">World name<small>[world]</small></span>";
