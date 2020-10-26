@@ -21324,3 +21324,18 @@ div.tagsinput {
 .slider-blue::-webkit-slider-thumb {
   background: #1a1aaa;
 }
+
+.draggable-element {
+  background-color: #000;
+  padding: 5px;
+  border-radius: 15px;
+  color: #F2F2F2;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+}
+
+.draggable-element small {
+  color: #6c726c;
+}

@@ -267,7 +267,7 @@ function check_for_configuration_errors(server_data, config_data, ranks_data, pl
         var has_valid_rank = false;
         var has_valid_usertag = false;
         for (var rank in ranks_data.Groups) {
-            if (rank.toLowerCase() == player_rank.toLowerCase()) {
+            if (rank.toLowerCase().replaceAll("prplus", "+") == player_rank.toLowerCase().replaceAll("prplus", "+")) {
                 has_valid_rank = true;
                 break;
             }
@@ -533,10 +533,10 @@ function show_content(page, item) {
 
         var select_content_player_rank = "";
         for (var rank in ranks_data.Groups) {
-            select_content_player_rank += "<option value=\"" + rank + "\" " + (rank === players_data.players[item].rank ? "selected" : "") + ">" + rank + "</option>";
+            select_content_player_rank += "<option value=\"" + rank + "\" " + (rank === players_data.players[item].rank ? "selected" : "") + ">" + rank.replaceAll("prplus", "+") + "</option>";
         }
         if (!select_content_player_rank.includes("selected")) {
-            select_content_player_rank += "<option value=\"" + players_data.players[item].rank + "\" selected style=\"color: #b12121\">" + players_data.players[item].rank + "</option>";
+            select_content_player_rank += "<option value=\"" + players_data.players[item].rank + "\" selected style=\"color: #b12121\">" + players_data.players[item].rank.replaceAll("prplus", "+") + "</option>";
         }
         $("#content-players-table-rank").html(select_content_player_rank);
         $("#content-players-table-rank").attr("onchange", "players_data.players['" + item + "'].rank = this.selectedOptions[0].value; show_content('players', '" + item + "');");
@@ -670,7 +670,133 @@ function show_content(page, item) {
     }
 }
 
+var mouseX = 0;
+var mouseY = 0;
+var drag_interval;
+var draging_element;
+var drop_target;
+
+function drag_element(self, target_element, output_element, input_format) {
+    target_element = $(target_element);
+    stop_drag(target_element, output_element);
+
+    var target = $(self);
+    var top = target.offset().top + target.height() / 2 - parseFloat(target.css("top").replace("px", ""));
+    var left = target.offset().left + target.width() / 2 - parseFloat(target.css("left").replace("px", ""));
+
+    draging_element = target;
+
+    drag_interval = setInterval(function(){
+        target.css({"left": (mouseX - left) + "px", "top": (mouseY - top) + "px", "z-index": "1", "background-color": "#2F2F2F"});
+
+        // $(".drop-here-placeholder").each(function(index){
+        //     if (index == 0) {
+        //         console.log($(this).offset().left + " - " + mouseX);
+        //     }
+        //     if (mouseX > $(this).offset().left - 50 && mouseX < $(this).offset().left + 50 + $(this).width() + 50) {
+        //         $(this).css({"visibility": "visible"});
+        //     } else {
+        //         $(this).css({"visibility": "hidden"});
+        //     }
+        // });
+    }, 1);
+
+    setup_drag_format("#" + target_element.attr('id'), output_element, input_format, input_format, true);
+}
+
+function setup_drag_format(target_element, output_element, input, input_format, drop_placeholders) {
+    target_element = $(target_element);
+    var drop_here_element = "<span id=\"drop-place-%d%\" class=\"drop-here-placeholder\" onmouseenter=\"drop_target = $(this);\" onmouseout=\"drop_target = null;\" onmouseup=\"stop_drag('#" + target_element.attr('id') + "', '" + output_element + "', '" + input_format + "');\" style=\"border: 1px dashed;position: relative;padding: 5px;border-radius: 15px;z-index: 2;\">+</span>";
+    var config_element = "<span id=\"edit-format-dragdrop-%id%\" class=\"draggable-element\" style=\"display: %display%;\">%d%<span style=\"background-color: #cc0909;border-radius: 15px;padding: 2px;margin-left: 5px;cursor: pointer;\" onclick=\"%c%\">x</span></span>";    
+    var body = "";
+    var input_split = [];
+    var element_to_add = "";
+    var element_to_add_index;
+
+    if (input.includes("+")) {
+        input_split = input.split("+")[0].split(" ");
+        element_to_add = input.split("+")[1].split("@")[0];
+        element_to_add_index = parseInt(input.split("+")[1].split("@")[1].replace("drop-place-", ""));
+
+        if (element_to_add.length > 0) {
+            input_split.splice(element_to_add_index, 0, element_to_add);
+            input_format = input_split.join(" ");
+        }
+        
+    } else if (input.includes("-")) {
+        input_split = input.split("-")[0].split(" ");
+        var remove_index = parseInt(input.split("-")[1].replace("edit-format-dragdrop-", ""));
+        input_split.splice(remove_index, 1);
+
+        input_format = input_split.join(" ");
+    } else {
+        input_split = input.split(" ");
+    }
+    drop_target = null;
+
+    var drop_here_element_index = 0;
+    for (var i = 0; i < input_split.length; i++) {
+        var display = "initial";
+        if (element_to_add.length > 0) {
+            if (i == element_to_add_index) {
+                display = "none";
+            }
+        }
+
+        if (input_split[i].length > 0) {
+            if (drop_placeholders) {
+                body += drop_here_element.replace("%d%", drop_here_element_index);
+            }
+            body += config_element.replace("%d%", input_split[i]).replace("%display%", display).replace("%id%", i).replace("%c%", "setup_drag_format('#" + target_element.attr("id") + "', '" + output_element + "', '" + input_split.join(' ') + "' + '-' + " + i + ", '" + input_format + "', false);");
+        }
+        drop_here_element_index += 1;
+    }
+    if (drop_placeholders) {
+        body += drop_here_element.replace("%d%", drop_here_element_index);
+    }
+
+    target_element.html(body);
+
+    for (var i = 0; i < target_element.children().length; i++) {
+        var child = target_element.children()[i];
+        if (child.style.display.toLowerCase().includes("none")) {
+            $(child).fadeIn();
+        }
+    }
+
+    $(output_element).text(input_format);
+}
+
+function stop_drag(target_element, output_element, input_format) {
+    target_element = $(target_element);
+    if (drag_interval != null) {
+        clearInterval(drag_interval);
+        draging_element.css({"left": "0px", "top": "0px", "z-index": "0", "background-color": "#000"});
+
+        var pr_format = "";
+        if (draging_element.children()[0].nodeName.toLowerCase().includes("input")) {
+            pr_format = draging_element.children()[0].value;
+        } else {
+            pr_format = draging_element.children()[0].innerText;
+        }
+        drag_interval = null;
+
+        if (drop_target != null) {
+            setup_drag_format("#" + target_element.attr('id'), output_element, input_format + "+" + pr_format + "@" + drop_target.attr("id"), input_format, false);
+        } else {
+            setup_drag_format("#" + target_element.attr('id'), output_element, input_format, input_format, false);
+        }
+    }
+}
+
+function updateMousePosition(event) {
+    mouseX = event.pageX;
+    mouseY = event.pageY;
+}
+
 function updateConfigContentBody(config_item) {
+    document.addEventListener('mousemove', updateMousePosition);
+
     var body = "<table class=\"table table-bordered\"><thead><tr><th scope=\"col\">Key</th><th scope=\"col\">Value</th><th scope=\"col\">Description</th></tr></thead><tbody>";
     var error = false;
 
@@ -684,7 +810,23 @@ function updateConfigContentBody(config_item) {
 
             body += "<tr>";
             body += "<td>Format</td>";
-            body += "<td><input class=\"form-control\" type=\"text\" value=\"" + config_data.chat.format + "\" onchange=\"config_data.chat.format = this.value;\" style=\"width: 100%;\"/></td>";
+            body += "<td>";
+            body += "Elements: <div style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Player name<small>[player]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">World name<small>[world]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Usertag<small>[usertag]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Rank prefix<small>[prefix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Rank suffix<small>[suffix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Subrank prefix<small>[subprefix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Subrank suffix<small>[subsuffix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\">Chat message<small>[msg]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" onmouseup=\"stop_drag('#chat-format-droppable', '#chat-output', '" + config_data.chat.format + "');\" class=\"draggable-element\"><input placeholder=\"Custom text &#187;\" style=\"border: 0px;border-radius: 15px;color: #F2F2F2;background-color: #000;width: 100px;\"/></span>";
+            body += "</div><br /><br /><br />";
+            body += "Format:<div id=\"chat-format-droppable\" style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
+            body += "<img src  onerror=\"setup_drag_format('#chat-format-droppable', '#chat-output', config_data.chat.format, '" + config_data.chat.format + "', false);\">"; // Dirty trick
+            body += "</div><br /><br /><br />";
+            body += "Output: <span id=\"chat-output\" style=\"color: #F2F2F2;\">" + config_data.chat.format + "</span>";
+            body += "</td>";
             body += "<td>Change the chat format</td>";
             body += "</tr>";
             break;
@@ -696,9 +838,30 @@ function updateConfigContentBody(config_item) {
             body += "<td>Enable or disable modification of the tab(player) list format</td>";
             body += "</tr>";
     
+            // body += "<tr>";
+            // body += "<td>Format</td>";
+            // body += "<td><input class=\"form-control\" type=\"text\" value=\"" + config_data.tablist_modification.format + "\" onchange=\"config_data.tablist_modification.format = this.value;\" style=\"width: 100%;\"/></td>";
+            // body += "<td>Change the tab(player) list format</td>";
+            // body += "</tr>";
+
             body += "<tr>";
             body += "<td>Format</td>";
-            body += "<td><input class=\"form-control\" type=\"text\" value=\"" + config_data.tablist_modification.format + "\" onchange=\"config_data.tablist_modification.format = this.value;\" style=\"width: 100%;\"/></td>";
+            body += "<td>";
+            body += "Elements: <div style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Player name<small>[player]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">World name<small>[world]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Usertag<small>[usertag]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Rank prefix<small>[prefix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Rank suffix<small>[suffix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Subrank prefix<small>[subprefix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\">Subrank suffix<small>[subsuffix]</small></span>";
+            body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "');\" class=\"draggable-element\"><input placeholder=\"Custom text &#187;\" style=\"border: 0px;border-radius: 15px;color: #F2F2F2;background-color: #000;width: 100px;\"/></span>";
+            body += "</div><br /><br /><br />";
+            body += "Format:<div id=\"tablist-format-droppable\" style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
+            body += "<img src  onerror=\"setup_drag_format('#tablist-format-droppable', '#tablist-output', config_data.tablist_modification.format, '" + config_data.tablist_modification.format + "', false);\">"; // Dirty trick
+            body += "</div><br /><br /><br />";
+            body += "Output: <span id=\"tablist-output\" style=\"color: #F2F2F2;\">" + config_data.tablist_modification.format + "</span>";
+            body += "</td>";
             body += "<td>Change the tab(player) list format</td>";
             body += "</tr>";
             break;
@@ -757,6 +920,36 @@ function updateConfigContentBody(config_item) {
             body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-deluxetags-enabled\" type=\"checkbox\" " + (config_data.plugin_hook.deluxetags ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-deluxetags-enabled').attr('checked', !$('.checkbox-deluxetags-enabled').attr('checked')); config_data.plugin_hook.deluxetags = !!$('.checkbox-deluxetags-enabled').attr('checked');\"></span></td>";
             body += "<td>Enable or disable the use of <code>DeluxeTags</code><br /><small>Warning: When enabled this will disable the UserTags in PowerRanks in favour of DeluxeTags</small></td>";
             body += "</tr>";
+
+            if (calculatePowerRanksVersionFromString(server_data.powerranks_version) >= calculatePowerRanksVersionFromString("1.9")) {
+                body += "<tr>";
+                body += "<td>NametagEdit</td>";
+                body += "<td class=\"checkbox-container\"><input class=\"checkbox-input checkbox-nametagedit-enabled\" type=\"checkbox\" " + (config_data.plugin_hook.nametagedit ? "checked" : "") + " /><span class=\"checkbox-checkmark\" onclick=\"$('.checkbox-nametagedit-enabled').attr('checked', !$('.checkbox-nametagedit-enabled').attr('checked')); config_data.plugin_hook.nametagedit = !!$('.checkbox-nametagedit-enabled').attr('checked');\"></span></td>";
+                body += "<td>Enable or disable the use of <code>NametagEdit</code></td>";
+                body += "</tr>";
+            }
+            break;
+        
+        case "nametagedit":
+            if (calculatePowerRanksVersionFromString(server_data.powerranks_version) >= calculatePowerRanksVersionFromString("1.9")) {
+                body += "<tr>";
+                body += "<td>Prefix Format</td>";
+                body += "<td><input class=\"form-control\" type=\"text\" value=\"" + config_data.nametagedit.prefix + "\" onchange=\"config_data.nametagedit.prefix = this.value;\" style=\"width: 100%;\"/></td>";
+                body += "<td>Change the prefix that's used with NametagEdit</td>";
+                body += "</tr>";
+
+                body += "<tr>";
+                body += "<td>Suffix Format</td>";
+                body += "<td><input class=\"form-control\" type=\"text\" value=\"" + config_data.nametagedit.suffix + "\" onchange=\"config_data.nametagedit.suffix = this.value;\" style=\"width: 100%;\"/></td>";
+                body += "<td>Change the suffix that's used with NametagEdit</td>";
+                body += "</tr>";
+            } else {
+                body += "<tr>";
+                body += "<td>NametagEdit</td>";
+                body += "<td>Not available in your version of PowerRanks</td>";
+                body += "<td>Format to use with NametagEdit</td>";
+                body += "</tr>";
+            }
             break;
 
         case "updates":
