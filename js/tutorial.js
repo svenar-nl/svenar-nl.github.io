@@ -173,11 +173,167 @@ function showHelpTour() {
             placement: "top"
         });
 
-    // } else if (helpTourCurrentPage == "ranks") {
+    } else if (helpTourCurrentPage == "ranks") {
 
-    // } else if (helpTourCurrentPage == "usertags") {
+        helpTour.addStep({
+            element: "#help-ranks-1",
+            title: "Rank information",
+            content: "General rank options can be changed here.",
+            placement: "right"
+        });
 
-    // } else if (helpTourCurrentPage == "players") {
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-name",
+            title: "Rank information",
+            content: "Set the rank's identifier here.",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-prefix",
+            title: "Rank information",
+            content: "Set the rank's prefix here.",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-suffix",
+            title: "Rank information",
+            content: "Set the rank's suffix here.",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-chatcolor-color",
+            title: "Rank information",
+            content: "In what color show the player's chat be?",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-namecolor-color",
+            title: "Rank information",
+            content: "What color should the player's name have?",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-build",
+            title: "Rank information",
+            content: "Should this rank be able to break / place blocks?",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-inheritances",
+            title: "Rank information",
+            content: "Copy the permission nodes of a different rank to this rank.",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-promote",
+            title: "Rank information",
+            content: "Rank to change to when <code>/pr promote</code> is called",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-demote",
+            title: "Rank information",
+            content: "Rank to change to when <code>/pr demote</code> is called",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-economy-buyable",
+            title: "Rank information",
+            content: "What ranks should players be able to buy if they have this rank?",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-economy-cost",
+            title: "Rank information",
+            content: "Set the cost of this rank.",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#content-ranks-table-rank-gui-icon",
+            title: "Rank information",
+            content: "What item should be shown for this rank in <code>/pr gui</code>?",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#help-ranks-2",
+            title: "Rank permissions",
+            content: "Add/removed or allow/disallow permissions on the rank.",
+            placement: "left"
+        });
+
+    } else if (helpTourCurrentPage == "usertags") {
+        
+        helpTour.addStep({
+            element: "#content-usertags-item",
+            title: "Edit usertag",
+            content: "Edit or delete the usertag here.",
+            placement: "top"
+        });
+
+    } else if (helpTourCurrentPage == "players") {
+
+        helpTour.addStep({
+            element: "#help-players-1",
+            title: "Player information",
+            content: "Basic information about this player.",
+            placement: "top"
+        });
+
+        helpTour.addStep({
+            element: "#content-players-table-rank",
+            title: "Player information",
+            content: "Edit the rank of the player here.",
+            placement: "top"
+        });
+
+        helpTour.addStep({
+            element: "#content-players-table-usertag",
+            title: "Player information",
+            content: "Edit the usertag of the player here.",
+            placement: "top"
+        });
+
+        helpTour.addStep({
+            element: "#help-players-2",
+            title: "Player permissions",
+            content: "Edit the permissions of this player here.",
+            placement: "top"
+        });
+
+        helpTour.addStep({
+            element: "#help-players-3",
+            title: "Player subranks",
+            content: "Edit the subranks of this player here.",
+            placement: "top"
+        });
+
+        helpTour.addStep({
+            element: "#help-players-4",
+            title: "In-game preview",
+            content: "See how it will look in-game.",
+            placement: "top"
+        });
+
+    } else if (helpTourCurrentPage == "about") {
+
+        helpTour.addStep({
+            element: "#help-about-1",
+            title: "About",
+            content: "Consider supporting me.",
+            placement: "top"
+        });
 
     } else {
         alert("Help page for " + helpTourCurrentPage + " is not available!");
