@@ -893,6 +893,7 @@ function updateConfigContentBody(config_item) {
             body += "<td>Format</td>";
             body += "<td>";
             body += "Elements: <div style=\"margin-top: 8px;margin-bottom: 8px;display: inline;\">";
+            // onmouseenter=\"$(this).css({'background-color': '#232323'});\" onmouseout=\"$(this).css({'background-color': '#000'});\"
             body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist_modification');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist_modification');\" class=\"draggable-element\">Player name<small>[player]</small></span>";
             body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist_modification');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist_modification');\" class=\"draggable-element\">World name<small>[world]</small></span>";
             body += "<span onmousedown=\"drag_element(this, '#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist_modification');\" onmouseup=\"stop_drag('#tablist-format-droppable', '#tablist-output', '" + config_data.tablist_modification.format + "', 'tablist_modification');\" class=\"draggable-element\">Usertag<small>[usertag]</small></span>";

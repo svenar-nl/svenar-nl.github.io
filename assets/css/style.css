@@ -21334,6 +21334,7 @@ div.tagsinput {
   -moz-user-select: none;
   -webkit-user-select: none;
   position: relative;
+  cursor: pointer;
 }
 
 .draggable-element small {
