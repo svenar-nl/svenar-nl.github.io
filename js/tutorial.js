@@ -173,6 +173,20 @@ function showHelpTour() {
             placement: "top"
         });
 
+        helpTour.addStep({
+            element: "#help-config-draggable-elements",
+            title: "Configuration",
+            content: "These elements are draggable to change the format.",
+            placement: "right"
+        });
+
+        helpTour.addStep({
+            element: "#chat-format-droppable",
+            title: "Configuration",
+            content: "Dragged elements can be dropped on the + sign here.",
+            placement: "right"
+        });
+
     } else if (helpTourCurrentPage == "ranks") {
 
         helpTour.addStep({
