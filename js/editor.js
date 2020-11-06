@@ -1,5 +1,5 @@
 var raw_data_input = "";
-var file_base_url = "https://file.io/";
+var file_base_url = "https://svenar.nl/databin/";
 var editor_data = {};
 
 var rankDistributionChart = undefined;
@@ -44,7 +44,7 @@ $(document).ready(function() {
     if (parseURLParams(window.location.href) === undefined || parseURLParams(window.location.href).id === undefined) {
         $("#noidoverlay").show();
     } else {
-        var request_url = file_base_url + parseURLParams(window.location.href).id[0];
+        var request_url = file_base_url + parseURLParams(window.location.href).id[0] + "?raw=1";
         if (parseURLParams(window.location.href).id[0].toLowerCase() === "demo") {
             request_url = "demo.txt";
             $("#editorexportdatabutton").hide();
@@ -59,6 +59,7 @@ $(document).ready(function() {
         if (parseURLParams(window.location.href).id[0].toLowerCase() === "save") {
             loadDataCookie();
         } else {
+            console.log(request_url);
             setTimeout(function(){
                 $.ajax({
                     type: 'GET',
@@ -1171,29 +1172,42 @@ function exportData() {
         }
     }
 
-    const API_ENDPOINT = file_base_url;
-    const request = new XMLHttpRequest();
-    const formData = new FormData();
-
-    request.open("POST", API_ENDPOINT, true);
-    request.onreadystatechange = () => {
-        console.log(request);
-        console.log(request.responseText);
-        if (request.readyState === 4) {
-            if (request.status === 200) {
-                var data = JSON.parse(request.responseText);
-                $("#popup-exporting").fadeOut();
-                $("#popup-export-done").fadeIn();
-                $("#export-id").text(data["key"]);
-                $("#export-command").text("/pr webeditor load " + data["key"]);
-            } else {
-                alert("There was a error exporting your data, please save and try again in a few minutes.");
-                $("#popup-exporting").fadeOut();
-            }
+    $.ajax({
+        type: "POST",
+        url: file_base_url,
+        //headers: {"X-Requested-With": "JSONHttpRequest"},
+        data: {"raw": 0, "input": raw_data},
+        success: function( data ) {
+            $("#popup-exporting").fadeOut();
+            $("#popup-export-done").fadeIn();
+            $("#export-id").text(data);
+            $("#export-command").text("/pr webeditor load " + data);
         }
-    };
-    formData.append("file", new Blob([raw_data], {type: "text/plain"}));
-    request.send(formData);
+    });
+
+    // const API_ENDPOINT = file_base_url;
+    // const request = new XMLHttpRequest();
+    // const formData = new FormData();
+
+    // request.open("POST", API_ENDPOINT, true);
+    // request.onreadystatechange = () => {
+    //     console.log(request);
+    //     console.log(request.responseText);
+    //     if (request.readyState === 4) {
+    //         if (request.status === 200) {
+    //             var data = JSON.parse(request.responseText);
+    //             $("#popup-exporting").fadeOut();
+    //             $("#popup-export-done").fadeIn();
+    //             $("#export-id").text(data["key"]);
+    //             $("#export-command").text("/pr webeditor load " + data["key"]);
+    //         } else {
+    //             alert("There was a error exporting your data, please save and try again in a few minutes.");
+    //             $("#popup-exporting").fadeOut();
+    //         }
+    //     }
+    // };
+    // formData.append("file", new Blob([raw_data], {type: "text/plain"}));
+    // request.send(formData);
 
 }
 
